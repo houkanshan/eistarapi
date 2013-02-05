@@ -28,11 +28,15 @@ module PostsControllerTestHelper
     get_json(last_response)
   end
 
-  def assert_same_post(post1, post2)
-    assert_equal a_post.title,    b_post.title
-    assert_equal a_post.content,  b_post.content
+  def get_post_topic(filename)
+    get "/posts/#{filename}/topic"
+    get_json(last_response)
   end
 
+  def assert_same_post(post1, post2)
+    assert_equal post1.title,    post2.title
+    assert_equal post1.content,  post2.content
+  end
 
 end
 
@@ -130,6 +134,10 @@ class PostsControllerTest < FunctionalTestCase
     new_post = create_post @new_post
 
     reply_post(new_post.filename, @reply)
+  end
+
+  def test_get_post_topic
+
   end
 
 end

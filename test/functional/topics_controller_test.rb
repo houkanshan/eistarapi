@@ -1,5 +1,26 @@
 require_relative "../test_helper"
 
+module TopicsControllerTestHelper
+
+  def create_topic(new_topic)
+    # create new topic
+    post '/topics', new_topic
+    get_json(last_response)
+  end
+
+  def get_topic(filename)
+    get "/topics/#{filename}"
+    get_json(last_response)
+  end
+
+  def assert_same_topic(topic1, topic2)
+    assert_equal topic1.length, topic2.length
+    assert_equal topic1[0].title,    topic2[0].title
+    assert_equal topic1[0].content,  topic2[0].content
+  end
+
+end
+
 class TopicsControllerTest < FunctionalTestCase
   def setup
     # FIXME: needed?
@@ -34,11 +55,16 @@ class TopicsControllerTest < FunctionalTestCase
     assert_equal 20, topics.length
   end
 
-  def test_create_and_update_topic
-    # TODO, how insert real content in POST
-    post '/topics', @new_post
+  def test_get_topic
+    get '/topics'
+    last_topic = get_json(last_response)[0]
 
+    got_topic = get_topic(last_topic.filename)
+
+    assert_same_topic(last_topic, got_topic);
   end
+
+
 
 
 end
