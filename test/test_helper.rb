@@ -24,4 +24,8 @@ class FunctionalTestCase < TestCase
   def app
     Sinatra::Application
   end
+
+  def get_json(response)
+    JSON.parse(response.body)
+  end
 end
