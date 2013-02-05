@@ -1,0 +1,3 @@
+get '/boards' do
+end
+

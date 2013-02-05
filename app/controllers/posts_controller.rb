@@ -1,0 +1,2 @@
+get '/posts' do
+end

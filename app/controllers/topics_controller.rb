@@ -1,0 +1,2 @@
+get 'topics' do
+end
