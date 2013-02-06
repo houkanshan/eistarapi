@@ -1,36 +1,44 @@
 require_relative "../test_helper"
 
 module PostsControllerTestHelper
+  def get_posts(boardname, opt = {})
+    get '/posts', opt
+    get_json(last_response)
+  end
 
-  def create_post(new_post)
+  def create_post(boardname, new_post)
     # create new post
-    post '/posts', new_post
+    post '/boards/#{boardname}/posts', new_post
     get_json(last_response)
   end
 
-  def get_post(filename)
-    get "/posts/#{filename}"
+  def get_post(boardname, filename)
+    get "/boards/#{boardname}/posts/#{filename}"
     get_json(last_response)
   end
 
-  def update_post(filename, new_post)
-    put "/posts/#{filename}", new_post
+  def update_post(boardname, filename, new_post)
+    put "/boards/#{boardname}/posts/#{filename}", new_post
     get_json(last_response)
   end
 
-  def delete_post(filename)
-    delete "/posts/#{filename}"
+  def delete_post(boardname, filename)
+    delete "/boards/#{boardname}/posts/#{filename}"
     get_json(last_response)
   end
 
-  def reply_post(filename)
-    post "/posts/#{filename}/reply"
+  def reply_post(boardname, filename, reply)
+    post "/boards/#{boardname}/posts/#{filename}/reply", reply
     get_json(last_response)
   end
 
-  def get_post_topic(filename)
-    get "/posts/#{filename}/topic"
+  def get_post_topic(boardname, filename)
+    get "/boards/#{boardname}/posts/#{filename}/topic"
     get_json(last_response)
+  end
+
+  def cc_post (boardname, filename)
+    post "/boards/#{boardname}/posts/#{filename}/cc"
   end
 
   def assert_same_post(post1, post2)
@@ -48,6 +56,8 @@ class PostsControllerTest < FunctionalTestCase
     # login 
     # FIXME: needed?
     post '/sessions', :username => 'forapia', :password => '1111'
+
+    @boardName = "Water"
 
     @new_post = {
       title: 'test',
@@ -68,41 +78,38 @@ class PostsControllerTest < FunctionalTestCase
   end
 
   def test_get_posts_list
-    get '/posts' 
-    posts = get_json(last_response)
+    posts = get_posts @boardName
     assert_equal false, posts.empty?
   end
 
   def test_get_20_posts
-    get '/posts', :start => 0,:count => 20
-    posts = get_json(last_response)
+    posts = get_posts @boardName, start:0, count:20
 
     assert_equal 20, posts.length
   end
 
   def test_get_post
-    get '/posts'
-    a_post = get_json(last_response)[0]
+    a_post = get_posts(@boardName)[0]
 
-    b_post = get_post(a_post.filename)
+    b_post = get_post(@boardName, a_post.filename)
 
     assert_same_post(a_post, b_post)
   end
 
   def test_create_and_update_post
-    new_post = create_post(@new_post)
+    new_post = create_post @boardName, @new_post
     assert_same_post(new_post, @new_post)
 
     # get new post
-    new_post = get_post(new_post.filename)
+    new_post = get_post @boardName, new_post.filename
     assert_same_post @new_post, new_post
 
     # update post
-    new_post = update_post(new_post.filename, @update_post)
+    new_post = update_post(@boardName, new_post.filename, @update_post)
     assert_same_post(@update_post, new_post)
 
     # get update post
-    new_post = get_post(new_post.filename)
+    new_post = get_post(@boardName, new_post.filename)
     assert_same_post(@update_post, new_post)
   end
 
@@ -110,19 +117,19 @@ class PostsControllerTest < FunctionalTestCase
     # TODO, how insert real content in POST
     
     # create new post
-    new_post = create_post(@new_post)
+    new_post = create_post(@boardName, @new_post)
     assert_same_post(@new_post, new_post)
 
     # get new post
-    new_post = get_post(new_post.filename)
+    new_post = get_post(@boardName, new_post.filename)
     assert_same_post(@new_post, new_post)
 
     # delete new post
-    delete_post(new_post.filename)
+    delete_post(@boardNaem, new_post.filename)
     assert_equal 200, last_response.status
 
     # get deleted post
-    new_post = get_post(new_post.title)
+    new_post = get_post(@boardName, new_post.title)
 
     # TODO: or make it failed
     assert_not_equal @new_post.title, new_post.title
@@ -131,9 +138,14 @@ class PostsControllerTest < FunctionalTestCase
 
   def test_create_post_and_reply
     # create new post
-    new_post = create_post @new_post
+    new_post = create_post @boardName, @new_post
 
     reply_post(new_post.filename, @reply)
+  end
+
+  def test_cc_post
+    new_post = create_post( @boardName, @new_post )
+    post cc_post("Game", new_post.filename)
   end
 
   def test_get_post_topic
