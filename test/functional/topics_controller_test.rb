@@ -2,14 +2,19 @@ require_relative "../test_helper"
 
 module TopicsControllerTestHelper
 
-  def create_topic(new_topic)
-    # create new topic
-    post '/topics', new_topic
+  def get_topics(boardname, opt = {})
+    get "/boards/#{boardname}/topics", opt
     get_json(last_response)
   end
 
-  def get_topic(filename)
-    get "/topics/#{filename}"
+  def create_topic(boardname, new_topic)
+    # create new topic
+    post "/boards/#{boardname}/topics", new_topic
+    get_json(last_response)
+  end
+
+  def get_topic(boardname, filename)
+    get "/boards/#{boardname}/topics/#{filename}"
     get_json(last_response)
   end
 
@@ -25,6 +30,8 @@ class TopicsControllerTest < FunctionalTestCase
   def setup
     # FIXME: needed?
     post '/sessions', :username => 'forapia', :password => '1111'
+
+    @boardName = "Water"
 
     @new_post = {
       title: 'test',
@@ -42,23 +49,19 @@ class TopicsControllerTest < FunctionalTestCase
   end
 
   def test_get_topics_list
-    get '/topics'
-    topics = get_json(last_response)
+    topics = get_topics @boardName
 
     assert_equal false, topics.empty?
   end
 
   def test_get_20_topics
-    get '/topics', :start => 0, :count => 10
-    topics = get_json(last_response)
+    topics = get_topics @boardName, start: 0, count: 10
 
     assert_equal 20, topics.length
   end
 
   def test_get_topic
-    get '/topics'
-    last_topic = get_json(last_response)[0]
-
+    last_topic = get_topics(@boardName)[0]
     got_topic = get_topic(last_topic.filename)
 
     assert_same_topic(last_topic, got_topic);

@@ -2,13 +2,13 @@ require_relative "../test_helper"
 
 module PostsControllerTestHelper
   def get_posts(boardname, opt = {})
-    get '/posts', opt
+    get "/boards/#{boardname}/posts", opt
     get_json(last_response)
   end
 
   def create_post(boardname, new_post)
     # create new post
-    post '/boards/#{boardname}/posts', new_post
+    post "/boards/#{boardname}/posts", new_post
     get_json(last_response)
   end
 
