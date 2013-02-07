@@ -27,6 +27,8 @@ module TopicsControllerTestHelper
 end
 
 class TopicsControllerTest < FunctionalTestCase
+  include TopicsControllerTestHelper
+
   def setup
     # FIXME: needed?
     post '/sessions', :username => 'forapia', :password => '1111'
@@ -66,8 +68,4 @@ class TopicsControllerTest < FunctionalTestCase
 
     assert_same_topic(last_topic, got_topic);
   end
-
-
-
-
 end

@@ -1,16 +1,16 @@
-class BbsSession 
-  include HTTParty
-  include ParseHtml
+class Session < Resource
 
   attr_reader :cookie
 
   host = settings.api['host']
-  @@login_url = host + '/bbslogin'
-  @@logout_url = host + '/bbslogout'
+  URL = {
+    login: "#{host}/bbslogin",
+    logout: "#{host}/bbslogout"
+  }
 
 
   def initialize(username, password)
-    res = self.class.post(@@login_url, {
+    res = self.class.post(URL[:login], {
       body: {
         id: username,
         pw: password
@@ -25,11 +25,11 @@ class BbsSession
     @cookie
   end
 
-  def self.destroy(cookie = nil)
+  def self.destroy(cookie = {})
     #p cookie
 
     cookies(cookie)
-    res = get(@@logout_url);
+    res = get(URL[:logout]);
     cookie = ParseHtml.get_set_cookies(res.body)
 
     raise "logout failed" if cookie.empty?

@@ -1,13 +1,12 @@
 post '/sessions' do
   content_type :json
   begin 
-    new_session = BbsSession.new(params[:username], params[:password])
+    new_session = Session.new(params[:username], params[:password])
 
     cookies = new_session.cookie
 
-    cookies.each do |key, value|
-      response.set_cookie(key, value)
-    end
+    set_response_set_cookies(response, cookies)
+
     logger.info "#{params[:username]} login success"
 
     {'set_cookie'=> cookies}.to_json
@@ -24,9 +23,9 @@ delete '/sessions' do
   begin 
     content_type :json
 
-    cookies = get_bbs_cookies(request.cookies)
+    cookies = get_bbs_set_cookies(request.cookies)
 
-    BbsSession.destroy(cookies).to_json
+    Session.destroy(cookies).to_json
   rescue RuntimeError
     status 400
     error_res(:logout_error).to_json
