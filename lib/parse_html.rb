@@ -24,19 +24,18 @@ module ParseHtml
   end
 
   def get_boards_list(doc)
-    list = []
-    Nokogiri::HTML(doc).css('tr')[1..-1].each do |node|
+    list = Nokogiri::HTML(doc).css('tr')[1..-1].collect do |node|
       cols = node.css('td')
 
       admin = cols[4].css('a')[0]
       admin = admin && admin.content
 
-      list.push({
+      {
         name: cols[1].content,
         category: cols[2].content[1...-1],
         title: cols[3].content[3..-1],
         admin: admin
-      })
+      }
     end
 
     list
@@ -59,6 +58,20 @@ module ParseHtml
       title: get_title(doc),
       admin: get_board_admin(doc),
     }
+  end
+
+  def get_posts_list(doc)
+    Nokogiri::HTML(doc).css('table')[2].css('tr')[1..-1].collect do |node|
+      cols = node.css('td')
+
+      {
+        filename: cols[4].css('a')[0]['href'].match(/file=(M\..*\.A)/)[1],
+        index: cols[0].content,
+        author: cols[2].content,
+        date: cols[3].content,
+        title: cols[4].content
+      }
+    end
   end
 
 
