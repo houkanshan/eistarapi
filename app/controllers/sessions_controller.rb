@@ -10,11 +10,14 @@ post '/sessions' do
     logger.info "#{params[:username]} login success"
 
     {'set_cookie'=> cookies}.to_json
-  rescue RuntimeError
+  rescue RuntimeError => detail
     logger.info "#{params[:username]} login failed"
 
     status 403
-    error_res(:login_error).to_json
+    err = error_res(:login_error)
+    err[:detail] = detail.message
+
+    err.to_json
   end
 end
 
@@ -26,8 +29,11 @@ delete '/sessions' do
     cookies = get_bbs_set_cookies(request.cookies)
 
     Session.destroy(cookies).to_json
-  rescue RuntimeError
+  rescue RuntimeError => detail
     status 400
-    error_res(:logout_error).to_json
+    err = error_res(:logout_error)
+    err[:detail] = detail.message
+
+    err.to_json
   end
 end

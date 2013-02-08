@@ -18,27 +18,23 @@ class Session < Resource
     })
     @cookie = get_set_cookies(res.body)
 
-    raise "login failed" if @cookie.empty?
-  end
-
-  def get_cookies
-    @cookie
+    raise get_warning(res.body) if @cookie.empty?
   end
 
   def self.destroy(cookie = {})
     #p cookie
-
     cookies(cookie)
     res = get(URL[:logout]);
     cookie = ParseHtml.get_set_cookies(res.body)
 
-    raise "logout failed" if cookie.empty?
+    raise ParseHtml.get_warning(res.body) if cookie.empty?
 
     cookie
   end
 
-  def destroy()
-    self.destroy(@cookie)
+  def destroy
+    self.class.destroy(@cookie)
   end
 
 end
+

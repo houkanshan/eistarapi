@@ -1,5 +1,5 @@
 require_relative "../test_helper"
-
+=begin
 module PostsControllerTestHelper
   def get_posts(boardname, opt = {})
     get "/boards/#{boardname}/posts", opt
@@ -153,3 +153,4 @@ class PostsControllerTest < FunctionalTestCase
   end
 
 end
+=end

@@ -1,5 +1,4 @@
 require_relative "../test_helper"
-
 class SessionControllerTest < FunctionalTestCase
   def setup
     # make sure no login
@@ -17,16 +16,16 @@ class SessionControllerTest < FunctionalTestCase
   end
 
   def test_login
-    post '/sessions', :username => 'forapia', :password => '1111'
+    post '/sessions', :username => 'forapic', :password => '1111'
     assert_equal 200, last_response.status
   end
 
   def test_logout
-    post '/sessions', :username => 'forapia', :password => '1111'
+    post '/sessions', :username => 'forapid', :password => '1111'
     delete '/sessions'
 
-    # let it be, FIXME
-    #assert_equal true, last_response.ok?
+    assert_equal true, last_response.ok?
   end
 
 end
+

@@ -13,7 +13,7 @@ module BoardsControllerTestHelper
 
 end
 
-class BoardControllerTest
+class BoardControllerTest < FunctionalTestCase
   include BoardsControllerTestHelper
 
   def setup
@@ -26,17 +26,19 @@ class BoardControllerTest
   def test_get_boards
     boards = get_boards
     assert_equal false, boards.empty?
+    assert_equal '2000', boards[0]['name']
+    assert_equal 'luxcq', boards[0]['admin']
   end
 
-  def test_get_20_boards
-    boards = get_boards start: 0, count: 10
-    assert_equal 10, boards.length
-  end
+  #def test_get_20_boards
+    #boards = get_boards start: 0, count: 10
+    #assert_equal 10, boards.length
+  #end
 
-  def test_get_boards_info
+  def test_get_board
     board = get_board(@boardName)
-    assert_equal "kidz", board.admin
-    assert_equal true, board.count > 12151
+    assert_equal "kidz", board['admin']
+    assert_equal "Water", board['name']
   end
 
 end
