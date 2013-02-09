@@ -17,7 +17,22 @@ end
 get "/boards/:boardname/posts/:filename" do
   begin
     post = Post.new(get_bbs_set_cookies(request.cookies))
-    post.find(params[:boardname], params[:start], params[:count]).to_json
+    post.find(params[:boardname], params[:filename]).to_json
+  rescue RuntimeError => detail
+    status 404
+    err = error_res(:no_board)
+    err[:detail] = detail.message
+    err.to_json
+  end
+end
+
+delete "/boards/:boardname/posts/:filename" do
+  begin
+    post = Post.new(get_bbs_set_cookies(request.cookies))
+    post.delete(params[:boardname], params[:filename])
+    post[:detail] = error_res(:success)
+
+    post.to_json
   rescue RuntimeError => detail
     status 404
     err = error_res(:no_board)

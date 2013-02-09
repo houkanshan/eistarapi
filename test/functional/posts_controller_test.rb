@@ -41,8 +41,11 @@ module PostsControllerTestHelper
   end
 
   def assert_same_post(post1, post2)
-    assert_equal post1.title,    post2.title
-    assert_equal post1.content,  post2.content
+    assert_equal post1["title"], post2["title"]
+    assert_equal post1["content"], post2["content"]
+    assert_equal post1["author"]["id"], post2["author"]["id"]
+    assert_equal post1["from"], post2["from"]
+    assert_equal post1["filename"], post2["filename"]
   end
 
 end
@@ -56,7 +59,7 @@ class PostsControllerTest < FunctionalTestCase
     # FIXME: needed?
     #post '/sessions', :username => 'forapia', :password => '1111'
 
-    @boardName = "Water"
+    @boardName = "Weather"
 
     @new_post = {
       title: 'test',
@@ -99,33 +102,39 @@ class PostsControllerTest < FunctionalTestCase
 
   def test_get_1_posts
     posts = get_posts @boardName, start: 0, count:1
-    assert_equal 12153, Integer(posts[0]['index'])
+    assert_equal 1809, Integer(posts[0]['index'])
   end
 
-  #def test_get_post
-    #a_post = get_posts(@boardName)[0]
+  def test_get_unkown_board
+    get "/boards/Wate/posts"
+    assert_equal 404, last_response.status
+  end
 
-    #b_post = get_post(@boardName, a_post.filename)
+  def test_get_post
+    a_post = get_posts(@boardName)[0]
 
-    #assert_same_post(a_post, b_post)
-  #end
+    b_post = get_post(@boardName, a_post["filename"])
 
-  #def test_create_and_update_post
-    #new_post = create_post @boardName, @new_post
-    #assert_same_post(new_post, @new_post)
+    a_post["author"] == b_post["author"]
+    a_post["author_id"] == b_post["author"]["id"]
+    a_post["filename"] == b_post["filename"]
+  end
 
-    ## get new post
-    #new_post = get_post @boardName, new_post.filename
-    #assert_same_post @new_post, new_post
+  def test_get_no_found_post
+    post = get_post(@boardName, 'M.124.A')
+    assert_equal 404, last_response.status
 
-    ## update post
-    #new_post = update_post(@boardName, new_post.filename, @update_post)
-    #assert_same_post(@update_post, new_post)
+    post = get_post('Wate', 'M.123.A')
+    assert_equal 404, last_response.status
+  end
 
-    ## get update post
-    #new_post = get_post(@boardName, new_post.filename)
-    #assert_same_post(@update_post, new_post)
-  #end
+  def test_delete_no_found
+    res = delete_post("Wate", 'M.123.A')
+    assert_equal 404, last_response.status
+
+    res = delete_post("Water", 'M.123.A')
+    assert_equal 404, last_response.status
+  end
 
   #def test_create_and_delete_post
     ## TODO, how insert real content in POST
@@ -148,6 +157,23 @@ class PostsControllerTest < FunctionalTestCase
     ## TODO: or make it failed
     #assert_not_equal @new_post.title, new_post.title
     #assert_not_equal @new_post.content, new_post.content
+  #end
+  
+  #def test_create_and_update_post
+    #new_post = create_post @boardName, @new_post
+    #assert_same_post(new_post, @new_post)
+
+    ## get new post
+    #new_post = get_post @boardName, new_post.filename
+    #assert_same_post @new_post, new_post
+
+    ## update post
+    #new_post = update_post(@boardName, new_post.filename, @update_post)
+    #assert_same_post(@update_post, new_post)
+
+    ## get update post
+    #new_post = get_post(@boardName, new_post.filename)
+    #assert_same_post(@update_post, new_post)
   #end
 
   #def test_create_post_and_reply
