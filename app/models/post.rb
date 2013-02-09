@@ -10,22 +10,19 @@ class Post < Resource
   }
 
   def list(boardname, opt = {start: 0, count: 20})
-    begin
-      opt[:start] ||= 0
-      opt[:count] ||= 20
+    #begin
 
-      # pre-get
-      first_list = get_a_list
+      @boardname = boardname
+      get_list opt[:start], opt[:count]
 
-      if first_list.length >= (opt[:count])
-        get_a_list()
-      end
-    rescue
-      raise get_warning(board_page.body)
-    end
+    #rescue
+      #raise get_warning(@last_page.body)
+    #end
   end
 
   def find(boardname, filename)
+    @boardname = boardname
+    @filename = filename
     begin
       # http://www.dian.org.cn:81/bbscon?board=Water&file=M.1359670151.A
     rescue
@@ -49,7 +46,6 @@ class Post < Resource
   # point : start, start+count, e.q. 0, 20
   # index : node.index, e.q.12152
   def get_list(start = 0, count = 20)
-    cur_count = 0
 
     fetched_list = get_a_page
 
@@ -59,11 +55,16 @@ class Post < Resource
 
     list = []
 
-    start_index, start_step = get_index_by_point(start)
+    start_index = get_index_by_point(start)
     end_index = get_index_by_point(start+count)
 
-    start_page = get_page_by_point(start)
-    end_page = get_page_by_point(start+count)
+    start_page, start_step = get_page_by_point(start)
+    end_page, end_step  = get_page_by_point(start+count)
+
+    #p "start_index: #{start_index}"
+    #p "end_index: #{end_index}"
+    #p "start_page: #{start_page}"
+    #p "end_page: #{end_page}"
 
     # jump to start page
     if @cur_page < start_page
@@ -73,7 +74,7 @@ class Post < Resource
 
     # get the requested long list (before croped)
     while @cur_page < end_page
-      fetched_list += get_a_page(@cur_start_index + @count_per_page)
+      fetched_list += get_a_page(@cur_start_index - 2*@count_per_page)
       @cur_page += 1
     end
 
@@ -93,11 +94,12 @@ class Post < Resource
     start &&= "&start=#{start}"
 
     # http://www.dian.org.cn:81/bbsdoc?board=Water
-    board_page = self.class.get("#{URL[:board_page]}?board=#{boardname}#{start}")
-    posts = get_posts_list(board_page.page)
+    url = "#{URL[:board_page]}?board=#{@boardname}#{start}"
+    @last_page = self.class.get(url)
+    posts = get_posts_list(@last_page.body)
 
     # set status
-    @cur_start_index = posts[0].index
+    @cur_start_index = Integer(posts[0][:index])
 
     posts
   end

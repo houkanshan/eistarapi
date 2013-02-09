@@ -33,7 +33,7 @@ module ParseHtml
       {
         name: cols[1].content,
         category: cols[2].content[1...-1],
-        title: cols[3].content[3..-1],
+        title: crop_title(cols[3].content),
         admin: admin
       }
     end
@@ -61,7 +61,7 @@ module ParseHtml
   end
 
   def get_posts_list(doc)
-    Nokogiri::HTML(doc).css('table')[2].css('tr')[1..-1].collect do |node|
+    posts = Nokogiri::HTML(doc).css('table')[2].css('tr')[1..-1].collect do |node|
       cols = node.css('td')
 
       {
@@ -69,9 +69,16 @@ module ParseHtml
         index: cols[0].content,
         author: cols[2].content,
         date: cols[3].content,
-        title: cols[4].content
+        title: crop_title(cols[4].content)
       }
     end
+    posts.reverse!
+  end
+
+  private
+  TITLE_REX = /○ /
+  def crop_title(title)
+    title.sub(TITLE_REX, '')
   end
 
 
