@@ -5,6 +5,7 @@ class Post < Resource
   URL = {
     board_page: "#{host}/bbsdoc",
     post_page: "#{host}/bbscon",
+    create_url: "#{host}/bbssnd",
     reply_url: "#{host}/bbspst",
     edit_url: "#{host}/bbsedit",
     delete_url: "#{host}/bbsdel",
@@ -35,9 +36,36 @@ class Post < Resource
     end
   end
 
+  def create(boardname, opt = {})
+    opt[:title] ||= ""
+    opt[:signature] ||= 1
+    opt[:autocr] ||= "on"
+    opt[:text] ||= ""
+
+    if (opt[:title].length == 0 || 
+        opt[:text].length == 0)
+      raise "attribute wrong"
+    end
+
+    #begin
+      # http://www.dian.org.cn:81/bbssnd?board=Weather
+      url = "#{URL[:create_url]}?board=#{boardname}"
+      res = self.class.post(url, {body: opt})
+
+      msg = get_warning(res.body)
+      if (msg.class == String) && msg.index('不能')
+        raise msg
+      end
+
+      opt
+    #rescue
+      #raise get_warning(res.body)
+    #end
+  end
+
   def delete(boardname, filename)
     #begin
-      url = "#{URL[:post_page]}?board=#{boardname}&file=#{filename}"
+      url = "#{URL[:delete_url]}?board=#{boardname}&file=#{filename}"
       res = self.class.get(url)
       warning = get_warning(res.body)
       if warning.index('成功')

@@ -26,11 +26,32 @@ get "/boards/:boardname/posts/:filename" do
   end
 end
 
+post "/boards/:boardname/posts" do
+  begin
+    post = Post.new(get_bbs_set_cookies(request.cookies))
+    post.create(params[:boardname], {
+      title: params[:title],
+      text: params[:text],
+      signature: params[:signature],
+      autocr: params[:autocr]
+    })
+
+    post.list(params[:boardname])[0].to_json
+  rescue RuntimeError => detail
+    status 400
+    err = error_res(:create_failed)
+    err[:detail] = detail.message
+    err.to_json
+  end
+end
+
 delete "/boards/:boardname/posts/:filename" do
   begin
     post = Post.new(get_bbs_set_cookies(request.cookies))
-    post.delete(params[:boardname], params[:filename])
-    post[:detail] = error_res(:success)
+    res = post.delete(params[:boardname], params[:filename])
+
+    post = error_res(:success)
+    post[:detail] = res
 
     post.to_json
   rescue RuntimeError => detail

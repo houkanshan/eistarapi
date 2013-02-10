@@ -21,7 +21,8 @@ module ParseHtml
     node = Nokogiri::HTML(doc).css('html')[0]
     warn_text = node.content
     warn_text =~ /^.*! (.*)! .*$/
-    warn = $1 || node.css('p').children[0].content
+    warn = $1 || 
+      (node.css('p').children[0] ? node.css('p').children[0].content : '')
   end
 
   def get_boards_list(doc)

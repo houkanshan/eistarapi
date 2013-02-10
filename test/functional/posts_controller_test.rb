@@ -1,11 +1,14 @@
+# encoding: UTF-8
 require_relative "../test_helper"
+
 module PostsControllerTestHelper
+
   def get_posts(boardname, opt = {})
     get "/boards/#{boardname}/posts", opt
     get_json(last_response)
   end
 
-  def create_post(boardname, new_post)
+  def create_post(boardname, new_post = {})
     # create new post
     post "/boards/#{boardname}/posts", new_post
     get_json(last_response)
@@ -62,18 +65,19 @@ class PostsControllerTest < FunctionalTestCase
     @boardName = "Weather"
 
     @new_post = {
-      title: 'test',
-      content: 'test for fun'
+      title: 'test1',
+      text: 'test for from eistar-api!'
     }
 
     @update_post = {
       title: 'test2',
-      content: 'test for fun again!'
+      text: 'test for from eistar-api again!'
     }
 
     @reply = {
-      content: 'this is a reply'
+      text: 'this is a reply'
     }
+
   end
 
   def teardown
@@ -102,7 +106,7 @@ class PostsControllerTest < FunctionalTestCase
 
   def test_get_1_posts
     posts = get_posts @boardName, start: 0, count:1
-    assert_equal 1809, Integer(posts[0]['index'])
+    assert_equal 1810, Integer(posts[0]['index'])
   end
 
   def test_get_unkown_board
@@ -136,28 +140,38 @@ class PostsControllerTest < FunctionalTestCase
     assert_equal 404, last_response.status
   end
 
-  #def test_create_and_delete_post
-    ## TODO, how insert real content in POST
-    
-    ## create new post
-    #new_post = create_post(@boardName, @new_post)
+  def test_create_failed
+    new_post = create_post(@boardName)
+    assert_equal 400, last_response.status
+  end
+
+  def test_create_and_delete_post
+    post '/sessions', :username => 'houks', :password => '1111'
+
+    last_index1 = get_posts(@boardName)[0]["index"]
+
+    # create new post
+    new_post = create_post(@boardName, @new_post)
     #assert_same_post(@new_post, new_post)
 
-    ## get new post
-    #new_post = get_post(@boardName, new_post.filename)
+    # get new post
+    new_post = get_post(@boardName, new_post["filename"])
     #assert_same_post(@new_post, new_post)
 
-    ## delete new post
-    #delete_post(@boardNaem, new_post.filename)
+    # delete new post
+    delete_post(@boardName, new_post["filename"])
     #assert_equal 200, last_response.status
 
-    ## get deleted post
-    #new_post = get_post(@boardName, new_post.title)
+    last_index2 = get_posts(@boardName)[0]["index"]
+    assert_equal(last_index1, last_index2)
 
-    ## TODO: or make it failed
+    # get deleted post
+    new_post = get_post(@boardName, new_post["filename"])
+
+    # TODO: or make it failed
     #assert_not_equal @new_post.title, new_post.title
     #assert_not_equal @new_post.content, new_post.content
-  #end
+  end
   
   #def test_create_and_update_post
     #new_post = create_post @boardName, @new_post
