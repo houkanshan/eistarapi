@@ -187,15 +187,15 @@ class PostsControllerTest < FunctionalTestCase
     # update post
     new_post = update_post(@boardName, new_post["filename"], @update_post)
     new_post
-    #assert_equal true, new_post["text"].index(@update_post[:text])
+    assert_equal true, new_post["text"].index(@update_post[:text])
 
     # get update post
     new_post = get_post(@boardName, new_post["filename"])
-    #assert_same_post(@update_post, new_post)
+    assert_same_post(@update_post, new_post)
 
     # delete new post
     delete_post(@boardName, new_post["filename"])
-    #assert_equal 200, last_response.status
+    assert_equal 200, last_response.status
 
     delete '/sessions'
   end
