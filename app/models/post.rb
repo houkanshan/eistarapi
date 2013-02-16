@@ -63,7 +63,7 @@ class Post < Resource
   end
   
   def update(boardname, filename, opt)
-    #begin 
+    begin 
       opt[:text] ||= ""
       opt[:board] = boardname
       opt[:file] = filename
@@ -74,14 +74,14 @@ class Post < Resource
       res = self.class.post(url, {body: opt})
 
       msg = get_warning(res.body)
-      if (msg.class == String && msg.index('不能'))
+      if (msg.class == String && (msg.include?('不能') || msg.include?('无权')))
         raise msg
       end
 
       opt
-    #rescue
-      #raise get_warning(res.body)
-    #end
+    rescue
+      raise get_warning(res.body)
+    end
   end
 
   def delete(boardname, filename)

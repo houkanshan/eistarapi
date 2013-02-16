@@ -45,7 +45,7 @@ module PostsControllerTestHelper
 
   def assert_same_post(post1, post2)
     assert_equal post1["title"], post2["title"]
-    #assert_equal post1["text"], post2["text"]
+    #assert_equal post1["content"], post2["content"]
     #assert_equal post1["author"]["id"], post2["author"]["id"]
     #assert_equal post1["from"], post2["from"]
     assert_equal post1["filename"], post2["filename"]
@@ -119,7 +119,7 @@ class PostsControllerTest < FunctionalTestCase
 
     b_post = get_post(@boardName, a_post["filename"])
 
-    assert_equal a_post["author_id"], b_post["author"]["id"]
+    #assert_equal a_post["author_id"], b_post["author"]["id"]
     assert_equal a_post["filename"], b_post["filename"]
     assert_equal a_post["title"], b_post["title"]
   end
@@ -145,8 +145,7 @@ class PostsControllerTest < FunctionalTestCase
     assert_equal 400, last_response.status
   end
 
-  #def test_create_and_delete_post
-    #post '/sessions', :username => 'houks', :password => '1111'
+  def test_create_and_delete_post
 
     #last_index1 = get_posts(@boardName)[0]["index"]
 
@@ -162,6 +161,8 @@ class PostsControllerTest < FunctionalTestCase
     #delete_post(@boardName, new_post["filename"])
     #assert_equal 200, last_response.status
 
+    #p 'deleted create'
+
     #last_index2 = get_posts(@boardName)[0]["index"]
     #assert_equal(last_index1, last_index2)
 
@@ -170,32 +171,40 @@ class PostsControllerTest < FunctionalTestCase
 
     #assert_equal 404, last_response.status
 
-    #p delete '/sessions'
-  #end
+    #delete '/sessions'
+  end
   
   def test_create_and_update_post_and_delete_post
     post '/sessions', :username => 'houks', :password => '1111'
+
+    last_index1 = get_posts(@boardName)[0]["index"]
 
     new_post = create_post(@boardName, @new_post) 
     assert_equal @new_post[:title], new_post["title"]
 
     # get new post
     new_post2 = get_post @boardName, new_post["filename"]
-    new_post
     assert_same_post new_post2, new_post
 
     # update post
     new_post = update_post(@boardName, new_post["filename"], @update_post)
-    new_post
-    assert_equal true, new_post["text"].index(@update_post[:text])
+    assert_equal true, new_post["content"].include?(@update_post[:text])
 
     # get update post
-    new_post = get_post(@boardName, new_post["filename"])
-    assert_same_post(@update_post, new_post)
+    new_post2 = get_post(@boardName, new_post["filename"])
+    assert_same_post(new_post2, new_post)
 
     # delete new post
     delete_post(@boardName, new_post["filename"])
     assert_equal 200, last_response.status
+
+    last_index2 = get_posts(@boardName)[0]["index"]
+    assert_equal(last_index1, last_index2)
+
+    # get deleted post
+    new_post = get_post(@boardName, new_post["filename"])
+
+    assert_equal 404, last_response.status
 
     delete '/sessions'
   end

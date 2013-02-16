@@ -30,6 +30,7 @@ end
 
 post "/boards/:boardname/posts" do
   content_type :json
+  boardname = params[:boardname]
   begin
     post = Post.new(get_bbs_set_cookies(request.cookies))
     post.create(params[:boardname], {
@@ -39,7 +40,7 @@ post "/boards/:boardname/posts" do
       autocr: params[:autocr]
     })
 
-    post.list(params[:boardname])[0].to_json
+    post.find(boardname, post.list(params[:boardname])[0][:filename]).to_json
   rescue RuntimeError => detail
     status 400
     err = error_res(:create_failed)
@@ -50,14 +51,17 @@ end
 
 put "/boards/:boardname/posts/:filename" do
   content_type :json
+
+  boardname = params[:boardname]
+  filename = params[:filename]
   #begin 
 
     post = Post.new(get_bbs_set_cookies(request.cookies))
-    res = post.update(params[:boardname], params[:filename], {
+    res = post.update(boardname, filename, {
       text: params[:text]
     })
 
-    post.list(params[:boardname])[0].to_json
+    post.find(boardname, post.list(boardname)[0][:filename]).to_json
 
   #rescue RuntimeError => detail
     #status 400
