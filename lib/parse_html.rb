@@ -3,14 +3,16 @@ require 'nokogiri'
 
 module ParseHtml
 
-  COOKIE_REX = /document.cookie='(\w+)=(\w+)'/
+  @@cookie_rex = /document.cookie='(\w+)=(\w+)'/
+
+
 
   def get_set_cookies(doc)
-    scripts = Nokogiri::HTML(doc).css('script')
+    scripts = parse(doc).css('script')
 
     cookie = {}
     scripts.each do |script|
-      script.content =~ COOKIE_REX
+      script.content =~ @@cookie_rex
       cookie[$1] = $2
     end
 
@@ -18,7 +20,7 @@ module ParseHtml
   end
 
   def get_warning(doc)
-    node = Nokogiri::HTML(doc).css('html')[0]
+    node = parse(doc).css('html')[0]
     warn_text = node.content
     warn_text =~ /^.*! (.*)! .*$/
     warn = $1 || 
@@ -26,7 +28,7 @@ module ParseHtml
   end
 
   def get_boards_list(doc)
-    list = Nokogiri::HTML(doc).css('tr')[1..-1].collect do |node|
+    list = parse(doc).css('tr')[1..-1].collect do |node|
       cols = node.css('td')
 
       admin = cols[4].css('a')[0]
@@ -44,15 +46,15 @@ module ParseHtml
   end
 
   def get_title(doc)
-    Nokogiri::HTML(doc).css('table')[0].content
+    parse(doc).css('table')[0].content
   end
 
   def get_board_admin(doc)
-    Nokogiri::HTML(doc).css('table')[1].css('a')[0].content
+    parse(doc).css('table')[1].css('a')[0].content
   end
 
   def get_board_note(doc)
-    Nokogiri::HTML(doc).css('table')[0].content
+    parse(doc).css('table')[0].content
   end
 
   def get_board_info(doc)
@@ -63,7 +65,7 @@ module ParseHtml
   end
 
   def get_posts_list(doc)
-    posts = Nokogiri::HTML(doc).css('table')[2].css('tr')[1..-1].collect do |node|
+    posts = parse(doc).css('table')[2].css('tr')[1..-1].collect do |node|
       cols = node.css('td')
       {
         filename: cols[4].css('a')[0]['href'].match(/file=(M\..*\.A)/)[1],
@@ -71,14 +73,14 @@ module ParseHtml
         author_id: cols[2].content,
         date: cols[3].content,
         title: crop_title(cols[4].css('a')[0].content),
-        size: cols[4].css('font')[0].content
+        size: get_size(cols[4].content)
       }
     end
     posts.reverse!
   end
 
   def parse_post_content(doc)
-    doc = Nokogiri::HTML(doc)
+    doc = parse(doc)
 
     # if error
     if doc.css('a').length < 4
@@ -117,13 +119,24 @@ module ParseHtml
   @@title_rex = /○ /
   @@from_rex = /^.*\[FROM: (.*)\].*$/
 
+  def parse(doc)
+    Nokogiri::HTML(doc, nil, 'gbk')
+  end
+
   def crop_title(title)
     title.sub(@@title_rex, '').strip
   end
+  def get_size(str)
+    str =~ /\((?:(\d+)字|(.+))\)/
+
+    $1 || $2
+  end
+
   def get_value(str)
     start = str.index(": ") + 2
     str[start..-1]
   end
+
 
   def get_author(author_str)
     pair = author_str.split(/[()]/)

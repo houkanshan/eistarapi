@@ -119,10 +119,9 @@ class PostsControllerTest < FunctionalTestCase
 
     b_post = get_post(@boardName, a_post["filename"])
 
-    p a_post, b_post
-
     assert_equal a_post["author_id"], b_post["author"]["id"]
     assert_equal a_post["filename"], b_post["filename"]
+    assert_equal a_post["title"], b_post["title"]
   end
 
   def test_get_no_found_post
