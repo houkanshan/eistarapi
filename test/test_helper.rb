@@ -28,4 +28,8 @@ class FunctionalTestCase < TestCase
   def get_json(response)
     JSON.parse(response.body)
   end
+
+  def hash2json(hash)
+    JSON.parse(hash.to_json)
+  end
 end

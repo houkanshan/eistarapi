@@ -6,8 +6,8 @@ class Post < Resource
     board_page: "#{host}/bbsdoc",
     post_page: "#{host}/bbscon",
     create_url: "#{host}/bbssnd",
+    update_url: "#{host}/bbsedit",
     reply_url: "#{host}/bbspst",
-    edit_url: "#{host}/bbsedit",
     delete_url: "#{host}/bbsdel",
     cc_url: "#{host}/bbsccc"
   }
@@ -27,7 +27,7 @@ class Post < Resource
       # http://www.dian.org.cn:81/bbscon?board=Water&file=M.1359670151.A
       url = "#{URL[:post_page]}?board=#{boardname}&file=#{filename}"
       post_page = self.class.get(url)
-      post = get_post_content(post_page.body)
+      post = parse_post_content(post_page.body)
       post[:filename] = filename
 
       post
@@ -42,12 +42,11 @@ class Post < Resource
     opt[:autocr] ||= "on"
     opt[:text] ||= ""
 
-    if (opt[:title].length == 0 || 
-        opt[:text].length == 0)
+    if (opt[:title].length == 0)
       raise "attribute wrong"
     end
 
-    #begin
+    begin
       # http://www.dian.org.cn:81/bbssnd?board=Weather
       url = "#{URL[:create_url]}?board=#{boardname}"
       res = self.class.post(url, {body: opt})
@@ -58,13 +57,35 @@ class Post < Resource
       end
 
       opt
+    rescue
+      raise get_warning(res.body)
+    end
+  end
+  
+  def update(boardname, filename, opt)
+    #begin 
+      opt[:text] ||= ""
+      opt[:board] = boardname
+      opt[:file] = filename
+      opt[:type] = 1
+
+      url = "#{URL[:update_url]}"
+
+      res = self.class.post(url, {body: opt})
+
+      msg = get_warning(res.body)
+      if (msg.class == String && msg.index('不能'))
+        raise msg
+      end
+
+      opt
     #rescue
       #raise get_warning(res.body)
     #end
   end
 
   def delete(boardname, filename)
-    #begin
+    begin
       url = "#{URL[:delete_url]}?board=#{boardname}&file=#{filename}"
       res = self.class.get(url)
       warning = get_warning(res.body)
@@ -73,10 +94,11 @@ class Post < Resource
       else
         raise warning
       end
-    #rescue
-      #raise get_warning(res.body)
-    #end
+    rescue
+      raise get_warning(res.body)
+    end
   end
+
 
   def reply(boardname, filename)
     begin

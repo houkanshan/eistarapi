@@ -65,7 +65,6 @@ module ParseHtml
   def get_posts_list(doc)
     posts = Nokogiri::HTML(doc).css('table')[2].css('tr')[1..-1].collect do |node|
       cols = node.css('td')
-
       {
         filename: cols[4].css('a')[0]['href'].match(/file=(M\..*\.A)/)[1],
         index: cols[0].content,
@@ -78,33 +77,52 @@ module ParseHtml
     posts.reverse!
   end
 
-  def get_post_content(doc)
-    filecontent = Nokogiri::HTML(doc).css('table')[0].content
+  def parse_post_content(doc)
+    doc = Nokogiri::HTML(doc)
+
+    # if error
+    if doc.css('a').length < 4
+      raise "error"
+    end
+
+    filecontent = doc.css('table')[0].content
+
     split_index = filecontent.index("\n\n") 
 
-    head = filecontent[0...split_index].split(/[\n,]/)
-    body = filecontent[split_index...-1]
 
-    {
-      author: get_author(get_value(head[1])),
-      border: get_value(head[2]),
-      title: get_value(head[3]),
-      date: get_date(get_value(head[4])),
-      filename: '',
-      content: body,
-      from: get_from(body)
-    }
+    begin
+      head = filecontent[0...split_index].split(/[\n,]/)
+      body = filecontent[split_index...-1]
+
+      {
+        author: head && get_author(get_value(head[1])),
+        border: head && get_value(head[2]),
+        title: head && get_value(head[3]),
+        date: head && get_date(get_value(head[4])),
+        filename: '',
+        content: body,
+        from: get_from(body)
+      }
+    rescue
+      {
+        content: filecontent,
+        from: get_from(filecontent)
+      }
+    end
+
+
   end
 
   private
-  TITLE_REX = /○ /
-  FROM_REX = /^.*\[FROM: (.*)\].*$/
+  @@title_rex = /○ /
+  @@from_rex = /^.*\[FROM: (.*)\].*$/
 
   def crop_title(title)
-    title.sub(TITLE_REX, '').strip
+    title.sub(@@title_rex, '').strip
   end
   def get_value(str)
-    str.split(": ")[1]
+    start = str.index(": ") + 2
+    str[start..-1]
   end
 
   def get_author(author_str)
@@ -120,8 +138,8 @@ module ParseHtml
   end
 
   def get_from(content)
-    last_line = content.rindex("\n", -2)
-    content[last_line...-1].sub(FROM_REX, '\1')
+    last_line = content.rindex("\n", -3)
+    content[last_line...-1].strip.sub(@@from_rex, '\1')
   end
 
 

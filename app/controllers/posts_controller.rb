@@ -1,4 +1,5 @@
 get "/boards/:boardname/posts" do
+  content_type :json
   begin
     post = Post.new(get_bbs_set_cookies(request.cookies))
 
@@ -15,6 +16,7 @@ get "/boards/:boardname/posts" do
 end
 
 get "/boards/:boardname/posts/:filename" do
+  content_type :json
   begin
     post = Post.new(get_bbs_set_cookies(request.cookies))
     post.find(params[:boardname], params[:filename]).to_json
@@ -27,6 +29,7 @@ get "/boards/:boardname/posts/:filename" do
 end
 
 post "/boards/:boardname/posts" do
+  content_type :json
   begin
     post = Post.new(get_bbs_set_cookies(request.cookies))
     post.create(params[:boardname], {
@@ -45,7 +48,28 @@ post "/boards/:boardname/posts" do
   end
 end
 
+put "/boards/:boardname/posts/:filename" do
+  content_type :json
+  #begin 
+
+    post = Post.new(get_bbs_set_cookies(request.cookies))
+    res = post.update(params[:boardname], params[:filename], {
+      text: params[:text]
+    })
+
+    post.list(params[:boardname])[0].to_json
+
+  #rescue RuntimeError => detail
+    #status 400
+    #err = error_res(:update_failed)
+    #err[:detail] = detail.message
+    #err.to_json
+  #end
+
+end
+
 delete "/boards/:boardname/posts/:filename" do
+  content_type :json
   begin
     post = Post.new(get_bbs_set_cookies(request.cookies))
     res = post.delete(params[:boardname], params[:filename])
