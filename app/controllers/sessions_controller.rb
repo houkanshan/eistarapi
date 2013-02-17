@@ -38,8 +38,6 @@ delete '/sessions' do
 end
 
 get '/sessions' do
-  #begin
   Session.test(get_bbs_set_cookies(request.cookies))
-  #end
 end
 

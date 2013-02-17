@@ -18,6 +18,9 @@ class SessionControllerTest < FunctionalTestCase
   def test_login
     post '/sessions', :username => 'forapie', :password => '1111'
     assert_equal 200, last_response.status
+    
+    get '/sessions'
+    assert_equal true, get_json(last_response)["logined"]
   end
 
   def test_logout
@@ -25,6 +28,9 @@ class SessionControllerTest < FunctionalTestCase
     delete '/sessions'
 
     assert_equal true, last_response.ok?
+
+    get '/sessions'
+    assert_equal false, get_json(last_response)["logined"]
   end
 
 end
