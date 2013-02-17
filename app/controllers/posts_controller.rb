@@ -34,8 +34,8 @@ post "/boards/:boardname/posts" do
   begin
     post = Post.new(get_bbs_set_cookies(request.cookies))
     post.create(boardname, {
-      title: params[:title],
-      text: params[:text],
+      title: (params[:title]),
+      text: (params[:text]),
       signature: params[:signature],
       autocr: params[:autocr]
     })
@@ -58,7 +58,7 @@ put "/boards/:boardname/posts/:filename" do
 
     post = Post.new(get_bbs_set_cookies(request.cookies))
     res = post.update(boardname, filename, {
-      text: params[:text]
+      text: (params[:text])
     })
 
     #post.find(boardname, post.list(boardname)[0][:filename]).to_json
@@ -78,27 +78,26 @@ post "/boards/:boardname/posts/:filename/reply" do
   content_type :json
   boardname = params[:boardname]
   filename = params[:filename]
-  #begin
+  begin
     post = Post.new(get_bbs_set_cookies(request.cookies))
 
     opt = {
-      text: params[:text]
+      text: (params[:text])
     }
-    params[:title] && (opt[:title] = params[:title])
+    params[:title] && (opt[:title] = (params[:title]))
     params[:signature] && (opt[:signature] = params[:signature])
     params[:autocr] && (opt[:autocr] = params[:autocr])
 
     reply = post.reply(boardname, filename, opt)
 
-    post.list(params[:boardname])[0]
     post.find(boardname, post.list(boardname)[0][:filename]).to_json
 
-  #rescue RuntimeError => detail
-    #status 400
-    #err = error_res(:create_failed)
-    #err[:detail] = detail.message
-    #err.to_json
-  #end
+  rescue RuntimeError => detail
+    status 400
+    err = error_res(:create_failed)
+    err[:detail] = detail.message
+    err.to_json
+  end
 end
 
 delete "/boards/:boardname/posts/:filename" do

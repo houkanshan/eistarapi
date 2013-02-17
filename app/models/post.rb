@@ -26,7 +26,7 @@ class Post < Resource
   def find(boardname, filename)
     begin
       # http://www.dian.org.cn:81/bbscon?board=Water&file=M.1359670151.A
-      url = "#{URL[:post_page]}?board=#{boardname}&file=#{filename}"
+      url = link_to(:post_page, boardname, filename)
 
       post_page = self.class.get(url)
       post = parse_post_content(post_page.body)
@@ -51,6 +51,7 @@ class Post < Resource
     begin
       # http://www.dian.org.cn:81/bbssnd?board=Weather
       url = "#{URL[:create_url]}?board=#{boardname}"
+      opt = encode_for_bbs(opt)
       res = self.class.post(url, {body: opt})
 
       msg = get_warning(res.body)
@@ -73,6 +74,7 @@ class Post < Resource
 
       url = "#{URL[:update_url]}"
 
+      opt = encode_for_bbs(opt)
       res = self.class.post(url, {body: opt})
 
       msg = get_warning(res.body)
@@ -103,7 +105,7 @@ class Post < Resource
 
 
   def reply(boardname, filename, opt)
-    #begin
+    begin
       # http://www.dian.org.cn:81/bbspst?board=Water&file=M.1359670151.A
       url = link_to(:edit_page, boardname, filename)
       page = self.class.get(url)
@@ -111,13 +113,14 @@ class Post < Resource
 
       # insert reply text
       opt[:text] ||= ""
-      opt[:text] += "\n\n" + opt_orig[:text]
+      opt[:text] += "\n" + opt_orig[:text]
 
       opt_orig.merge! opt
 
       # post
       # http://www.dian.org.cn:81/bbssnd?board=Weather
       url = link_to(:create_url, boardname)
+      opt_orig = encode_for_bbs(opt_orig)
       res = self.class.post(url, {body: opt_orig})
 
       msg = get_warning(res.body)
@@ -126,12 +129,11 @@ class Post < Resource
         raise msg
       end
 
-
       opt_orig
 
-    #rescue
-
-    #end
+    rescue
+      raise get_warning(res.body)
+    end
   end
 
   def cc(boardname, filename, to)

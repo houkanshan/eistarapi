@@ -24,7 +24,6 @@ class Topic < Resource
       #post[:filename] = filename
 
       posts
-
     #rescue
 
     #end

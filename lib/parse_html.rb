@@ -117,7 +117,8 @@ module ParseHtml
     doc.css('table').collect do |post|
       filename = filename_from_link(post.css('a')[0]['href'])
 
-      p content = post.content
+      content = post.content
+
       content.sub!(/\n.+\n/, "\n")
 
       post = parse_content(content)

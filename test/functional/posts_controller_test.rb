@@ -178,58 +178,51 @@ class PostsControllerTest < FunctionalTestCase
 
     #delete '/sessions'
   end
-  
-  def test_create_and_update_post_and_delete_post
-    #post '/sessions', :username => 'houks', :password => '1111'
 
-    #last_index1 = get_posts(@boardName)[0]["index"]
-
-    #new_post = create_post(@boardName, @new_post) 
-    #assert_equal @new_post[:title], new_post["title"]
-
-    ## get new post
-    #new_post2 = get_post @boardName, new_post["filename"]
-    #assert_same_post new_post2, new_post
-
-    ## update post
-    #new_post = update_post(@boardName, new_post["filename"], @update_post)
-    #assert_equal true, new_post["content"].include?(@update_post[:text])
-
-    ## get update post
-    #new_post2 = get_post(@boardName, new_post["filename"])
-    #assert_same_post(new_post2, new_post)
-
-    ## delete new post
-    #delete_post(@boardName, new_post["filename"])
-    #assert_equal 200, last_response.status
-
-    #last_index2 = get_posts(@boardName)[0]["index"]
-    #assert_equal(last_index1, last_index2)
-
-    ## get deleted post
-    #new_post = get_post(@boardName, new_post["filename"])
-
-    #assert_equal 404, last_response.status
-
-    #delete '/sessions'
-  end
-
-  def test_create_post_and_reply
+  def test_create_and_update_post_and_reply_and_delete_post
     unless logined?
-      #post '/sessions', :username => 'houks', :password => '1111'
+      post '/sessions', :username => 'houks', :password => '1111'
     end
 
-    ## get new post
-    #last_post = get_post(@boardName, get_posts(@boardName)[0]["filename"])
+    last_index1 = get_posts(@boardName)[0]["index"]
 
-    ## reply the post
-    #replyed_post = reply_post(@boardName, last_post["filename"], @reply)
+    new_post = create_post(@boardName, @new_post) 
+    assert_equal @new_post[:title], new_post["title"]
 
-    ### delete reply
-    ##delete_post(@boardName, replyed_post["filename"])
-    ##assert_equal 200, last_response.status
+    # get new post
+    new_post2 = get_post @boardName, new_post["filename"]
+    assert_same_post new_post2, new_post
 
-    #delete '/sessions'
+    # update post
+    new_post = update_post(@boardName, new_post["filename"], @update_post)
+    assert_equal true, new_post["content"].include?(@update_post[:text])
+
+    # get update post
+    new_post2 = get_post(@boardName, new_post["filename"])
+    assert_same_post(new_post2, new_post)
+
+    # delete new post
+    delete_post(@boardName, new_post["filename"])
+    assert_equal 200, last_response.status
+
+    last_index2 = get_posts(@boardName)[0]["index"]
+    assert_equal(last_index1, last_index2)
+
+    # get deleted post
+    new_post = get_post(@boardName, new_post["filename"])
+    assert_equal 404, last_response.status
+
+    sleep 2
+
+    # get new post
+    last_post = get_post(@boardName, get_posts(@boardName)[0]["filename"])
+
+    # reply the post
+    replyed_post = reply_post(@boardName, last_post["filename"], @reply)
+
+    # delete reply
+    delete_post(@boardName, replyed_post["filename"])
+    assert_equal 200, last_response.status
   end
 
   #def test_cc_post
