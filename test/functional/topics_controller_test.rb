@@ -58,9 +58,6 @@ class TopicsControllerTest < FunctionalTestCase
     last_topic = get_topics(@boardName)[0]
     got_topic = get_topic(@boardName, last_topic["filename"])
 
-    p last_topic
-    p got_topic
-
     assert_equal last_topic["filename"], got_topic.first["filename"]
   end
 end
