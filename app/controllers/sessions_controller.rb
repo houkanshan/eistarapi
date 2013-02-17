@@ -27,7 +27,11 @@ delete '/sessions' do
   begin 
     cookies = get_bbs_set_cookies(request.cookies)
 
-    Session.destroy(cookies).to_json
+    res_cookies = Session.destroy(cookies)
+
+    set_empty_set_cookies(response)
+
+    {'set_cookie'=> res_cookies}.to_json
   rescue RuntimeError => detail
     status 400
     err = error_res(:logout_error)

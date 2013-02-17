@@ -16,4 +16,10 @@ helpers do
     end
   end
 
+  def set_empty_set_cookies response
+    %w{utmpkey utmpnum utmpuserid}.each do |key|
+      response.set_cookie(key, '')
+    end
+  end
+
 end

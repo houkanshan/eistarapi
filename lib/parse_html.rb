@@ -3,7 +3,7 @@ require 'nokogiri'
 
 module ParseHtml
 
-  @@cookie_rex = /document.cookie='(\w+)=(\w+)'/
+  @@cookie_rex = /document.cookie='(\w+)=(\w*)'/
 
 
 

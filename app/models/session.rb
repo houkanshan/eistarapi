@@ -44,8 +44,9 @@ class Session < Resource
 
     if ParseHtml.get_warning(res.body).include?('未登录')
       {logined: false}.to_json
+    else
+      {logined: true}.to_json
     end
-    {logined: true}.to_json
   end
 
   def test
