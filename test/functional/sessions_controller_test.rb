@@ -16,12 +16,12 @@ class SessionControllerTest < FunctionalTestCase
   end
 
   def test_login
-    post '/sessions', :username => 'forapic', :password => '1111'
+    post '/sessions', :username => 'forapie', :password => '1111'
     assert_equal 200, last_response.status
   end
 
   def test_logout
-    post '/sessions', :username => 'forapid', :password => '1111'
+    post '/sessions', :username => 'forapif', :password => '1111'
     delete '/sessions'
 
     assert_equal true, last_response.ok?

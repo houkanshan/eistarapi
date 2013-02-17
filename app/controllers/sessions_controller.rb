@@ -23,9 +23,8 @@ end
 
 
 delete '/sessions' do
+  content_type :json
   begin 
-    content_type :json
-
     cookies = get_bbs_set_cookies(request.cookies)
 
     Session.destroy(cookies).to_json
@@ -37,3 +36,10 @@ delete '/sessions' do
     err.to_json
   end
 end
+
+get '/sessions' do
+  #begin
+  Session.test(get_bbs_set_cookies(request.cookies))
+  #end
+end
+

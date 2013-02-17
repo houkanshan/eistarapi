@@ -27,6 +27,7 @@ class Post < Resource
     begin
       # http://www.dian.org.cn:81/bbscon?board=Water&file=M.1359670151.A
       url = "#{URL[:post_page]}?board=#{boardname}&file=#{filename}"
+
       post_page = self.class.get(url)
       post = parse_post_content(post_page.body)
       post[:filename] = filename
@@ -110,22 +111,23 @@ class Post < Resource
 
       # insert reply text
       opt[:text] ||= ""
-      opt[:text] += opt_orig[:text]
+      opt[:text] += "\n\n" + opt_orig[:text]
 
       opt_orig.merge! opt
 
       # post
       # http://www.dian.org.cn:81/bbssnd?board=Weather
       url = link_to(:create_url, boardname)
-      p url
       res = self.class.post(url, {body: opt_orig})
 
       msg = get_warning(res.body)
+
       if (msg.class == String) && msg.index('不能')
         raise msg
       end
 
-      opt
+
+      opt_orig
 
     #rescue
 
@@ -140,7 +142,7 @@ class Post < Resource
 
   private
 
-  def link_to(page, boardname, filename)
+  def link_to(page, boardname, filename=nil)
     url = "#{URL[page]}?board=#{boardname}" + (filename ? "&file=#{filename}" : '')
   end
 
