@@ -115,6 +115,19 @@ module ParseHtml
 
   end
 
+  def form_opt_of(doc)
+    doc = parse(doc)
+    inputs = doc.css('input')
+    textareas = doc.css('textarea')
+
+    {
+      title: inputs[0]['value'],
+      signature: 1,
+      autocr: 'on',
+      text: textareas[0].content
+    }
+  end
+
   private
   @@title_rex = /○ /
   @@from_rex = /^.*\[FROM: (.*)\].*$/

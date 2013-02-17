@@ -5,6 +5,7 @@ class Post < Resource
   URL = {
     board_page: "#{host}/bbsdoc",
     post_page: "#{host}/bbscon",
+    edit_page: "#{host}/bbspst",
     create_url: "#{host}/bbssnd",
     update_url: "#{host}/bbsedit",
     reply_url: "#{host}/bbspst",
@@ -100,17 +101,47 @@ class Post < Resource
   end
 
 
-  def reply(boardname, filename)
-    begin
+  def reply(boardname, filename, opt)
+    #begin
       # http://www.dian.org.cn:81/bbspst?board=Water&file=M.1359670151.A
-    rescue
-    end
+      url = link_to(:edit_page, boardname, filename)
+      page = self.class.get(url)
+      opt_orig = form_opt_of(page.body)
+
+      # insert reply text
+      opt[:text] ||= ""
+      opt[:text] += opt_orig[:text]
+
+      opt_orig.merge! opt
+
+      # post
+      # http://www.dian.org.cn:81/bbssnd?board=Weather
+      url = link_to(:create_url, boardname)
+      p url
+      res = self.class.post(url, {body: opt_orig})
+
+      msg = get_warning(res.body)
+      if (msg.class == String) && msg.index('不能')
+        raise msg
+      end
+
+      opt
+
+    #rescue
+
+    #end
   end
 
   def cc(boardname, filename, to)
     begin
     rescue
     end
+  end
+
+  private
+
+  def link_to(page, boardname, filename)
+    url = "#{URL[page]}?board=#{boardname}" + (filename ? "&file=#{filename}" : '')
   end
 
 end
