@@ -16,7 +16,7 @@ class Post < Resource
   def list(boardname, opt = {start: 0, count: 20})
     begin
       # http://www.dian.org.cn:81/bbsdoc?board=Water
-      depage = DePage.new("#{URL[:board_page]}?board=#{boardname}")
+      depage = DePage.new(:post, "#{URL[:board_page]}?board=#{boardname}")
       depage.get_list opt[:start], opt[:count]
     rescue
       raise get_warning(depage.last_page.body)

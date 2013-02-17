@@ -32,4 +32,5 @@ class FunctionalTestCase < TestCase
   def hash2json(hash)
     JSON.parse(hash.to_json)
   end
+
 end

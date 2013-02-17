@@ -18,22 +18,13 @@ module TopicsControllerTestHelper
     get_json(last_response)
   end
 
-  def assert_same_topic(topic1, topic2)
-    assert_equal topic1.length, topic2.length
-    assert_equal topic1[0].title,    topic2[0].title
-    assert_equal topic1[0].content,  topic2[0].content
-  end
 
 end
-=begin
 class TopicsControllerTest < FunctionalTestCase
   include TopicsControllerTestHelper
 
   def setup
-    # FIXME: needed?
-    post '/sessions', :username => 'forapia', :password => '1111'
-
-    @boardName = "Water"
+    @boardName = "Weather"
 
     @new_post = {
       title: 'test',
@@ -54,19 +45,22 @@ class TopicsControllerTest < FunctionalTestCase
     topics = get_topics @boardName
 
     assert_equal false, topics.empty?
+    assert_equal 20, topics.length
   end
 
   def test_get_20_topics
     topics = get_topics @boardName, start: 0, count: 10
 
-    assert_equal 20, topics.length
+    assert_equal 10, topics.length
   end
 
   def test_get_topic
     last_topic = get_topics(@boardName)[0]
-    got_topic = get_topic(last_topic.filename)
+    got_topic = get_topic(@boardName, last_topic["filename"])
 
-    assert_same_topic(last_topic, got_topic);
+    p last_topic
+    p got_topic
+
+    assert_equal last_topic["filename"], got_topic.first["filename"]
   end
 end
-=end

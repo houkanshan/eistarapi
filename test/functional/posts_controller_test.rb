@@ -3,6 +3,11 @@ require_relative "../test_helper"
 
 module PostsControllerTestHelper
 
+  def logined?
+    get 'sessions'
+    get_json(last_response)["logined"]
+  end
+
   def get_posts(boardname, opt = {})
     get "/boards/#{boardname}/posts", opt
     get_json(last_response)
@@ -210,7 +215,9 @@ class PostsControllerTest < FunctionalTestCase
   end
 
   def test_create_post_and_reply
-    #post '/sessions', :username => 'houks', :password => '1111'
+    unless logined?
+      #post '/sessions', :username => 'houks', :password => '1111'
+    end
 
     ## get new post
     #last_post = get_post(@boardName, get_posts(@boardName)[0]["filename"])

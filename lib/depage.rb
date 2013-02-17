@@ -6,8 +6,9 @@ class DePage
 
   include ParseHtml
 
-  def initialize(url)
+  def initialize(type, url)
     @url = url
+    @type = type
   end
   
   def get_list(start = 0, count = 20)
@@ -60,7 +61,10 @@ class DePage
 
     url = "#{@url}#{start}"
     @last_page = HTTParty.get(url)
-    posts = get_posts_list(@last_page.body)
+
+    posts = (@type == :post) ? 
+      get_posts_list(@last_page.body) :
+      get_topics_list(@last_page.body)
 
     # set status
     @cur_start_index = Integer(posts[0][:index])

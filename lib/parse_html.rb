@@ -79,40 +79,52 @@ module ParseHtml
     posts.reverse!
   end
 
+  def get_topics_list(doc)
+    topics = parse(doc).css('table')[0].css('tr')[1..-1].collect do |node|
+      cols = node.css('td')
+      {
+        filename: filename_from_link(cols[4].css('a')[0]['href']),
+        index: cols[0].content,
+        author_id: cols[2].content,
+        date: cols[3].content,
+        title: crop_title(cols[4].css('a')[0].content)
+      }
+    end
+
+    topics 
+  end
+
   def parse_post_content(doc)
     doc = parse(doc)
 
     # if error
-    if doc.css('a').length < 4
+    if doc.css('a').length < 2
       raise "error"
     end
 
     filecontent = doc.css('table')[0].content
 
-    split_index = filecontent.index("\n\n") 
+    parse_content(filecontent)
+  end
 
+  def parse_topic_content(doc)
+    doc = parse(doc)
 
-    begin
-      head = filecontent[0...split_index].split(/[\n,]/)
-      body = filecontent[split_index...-1]
-
-      {
-        author: head && get_author(get_value(head[1])),
-        border: head && get_value(head[2]),
-        title: head && get_value(head[3]),
-        date: head && get_date(get_value(head[4])),
-        filename: '',
-        content: body,
-        from: get_from(body)
-      }
-    rescue
-      {
-        content: filecontent,
-        from: get_from(filecontent)
-      }
+    if doc.css('a').length < 2
+      raise "error"
     end
+    
+    doc.css('table').collect do |post|
+      filename = filename_from_link(post.css('a')[0]['href'])
 
+      p content = post.content
+      content.sub!(/\n.+\n/, "\n")
 
+      post = parse_content(content)
+      post[:filename] = filename
+
+      post
+    end
   end
 
   def form_opt_of(doc)
@@ -150,13 +162,16 @@ module ParseHtml
     str[start..-1]
   end
 
-
   def get_author(author_str)
     pair = author_str.split(/[()]/)
     {
       id: pair[0],
       name: pair[1]
     }
+  end
+
+  def filename_from_link(link)
+    link.match(/file=(M\..*\.A)/)[1]
   end
 
   def get_date(date_str)
@@ -166,6 +181,31 @@ module ParseHtml
   def get_from(content)
     last_line = content.rindex("\n", -3)
     content[last_line...-1].strip.sub(@@from_rex, '\1')
+  end
+
+  def parse_content(filecontent)
+    split_index = filecontent.index("\n\n") 
+
+
+    begin
+      head = filecontent[0...split_index].split(/[\n,]/)
+      body = filecontent[split_index...-1]
+
+      {
+        author: head && get_author(get_value(head[1])),
+        border: head && get_value(head[2]),
+        title: head && get_value(head[3]),
+        date: head && get_date(get_value(head[4])),
+        filename: '',
+        content: body,
+        from: get_from(body)
+      }
+    rescue
+      {
+        content: filecontent,
+        from: get_from(filecontent)
+      }
+    end
   end
 
 
