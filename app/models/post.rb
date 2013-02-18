@@ -2,10 +2,11 @@
 class Post < Resource
 
   host = settings.api['host']
-  URL = {
+  @@url = {
     board_page: "#{host}/bbsdoc",
     post_page: "#{host}/bbscon",
-    edit_page: "#{host}/bbspst",
+    edit_page: "#{host}/bbsedit",
+    reply_page: "#{host}/bbspst",
     create_url: "#{host}/bbssnd",
     update_url: "#{host}/bbsedit",
     reply_url: "#{host}/bbspst",
@@ -16,7 +17,7 @@ class Post < Resource
   def list(boardname, opt = {start: 0, count: 20})
     begin
       # http://www.dian.org.cn:81/bbsdoc?board=Water
-      depage = DePage.new(:post, "#{URL[:board_page]}?board=#{boardname}")
+      depage = DePage.new(:post, "#{@@url[:board_page]}?board=#{boardname}")
       depage.get_list opt[:start], opt[:count]
     rescue
       raise get_warning(depage.last_page.body)
@@ -50,7 +51,7 @@ class Post < Resource
 
     begin
       # http://www.dian.org.cn:81/bbssnd?board=Weather
-      url = "#{URL[:create_url]}?board=#{boardname}"
+      url = "#{@@url[:create_url]}?board=#{boardname}"
       opt = encode_for_bbs(opt)
       res = self.class.post(url, {body: opt})
 
@@ -66,13 +67,20 @@ class Post < Resource
   end
   
   def update(boardname, filename, opt)
-    begin 
-      opt[:text] ||= ""
+    #begin 
+      # get origin post
+      url = link_to(:edit_page, boardname, filename)
+      res = self.class.get(url)
+      orig_post = textarea_of(res.body)
+
+      
+      opt[:text] = insert_content_in(orig_post, opt[:text])
+
       opt[:board] = boardname
       opt[:file] = filename
       opt[:type] = 1
 
-      url = "#{URL[:update_url]}"
+      url = "#{@@url[:update_url]}"
 
       opt = encode_for_bbs(opt)
       res = self.class.post(url, {body: opt})
@@ -83,14 +91,14 @@ class Post < Resource
       end
 
       opt
-    rescue
-      raise get_warning(res.body)
-    end
+    #rescue
+      #raise get_warning(res.body)
+    #end
   end
 
   def delete(boardname, filename)
     begin
-      url = "#{URL[:delete_url]}?board=#{boardname}&file=#{filename}"
+      url = "#{@@url[:delete_url]}?board=#{boardname}&file=#{filename}"
       res = self.class.get(url)
       warning = get_warning(res.body)
       if warning.index('成功')
@@ -107,7 +115,7 @@ class Post < Resource
   def reply(boardname, filename, opt)
     begin
       # http://www.dian.org.cn:81/bbspst?board=Water&file=M.1359670151.A
-      url = link_to(:edit_page, boardname, filename)
+      url = link_to(:reply_page, boardname, filename)
       page = self.class.get(url)
       opt_orig = form_opt_of(page.body)
 
@@ -161,8 +169,30 @@ class Post < Resource
   private
 
   def link_to(page, boardname=nil, filename=nil)
-    url = "#{URL[page]}"+ (boardname ? "?board=#{boardname}": '')+ 
+    url = "#{@@url[page]}"+ (boardname ? "?board=#{boardname}": '')+ 
     (filename ? "&file=#{filename}" : '')
+  end
+
+  @@headRex = /((?:.+\n){3}\r?\n)/
+  @@tailRex = //
+
+  def insert_content_in(postcontent, content=nil)
+
+    # get head
+    postcontent =~ @@headRex
+    head = $1
+
+
+    # get tail
+    tail_index = postcontent.rindex("\n--")
+    tail = tail_index ? 
+      postcontent[tail_index..-1] : ''
+
+    #p postcontent, head, tail
+
+    content ||= ""
+
+    head + content + tail
   end
 
 end

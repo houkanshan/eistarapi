@@ -132,16 +132,20 @@ module ParseHtml
     end
   end
 
+  def textarea_of(doc)
+    doc = parse(doc)
+    doc.css('textarea')[0].content
+  end
+
   def form_opt_of(doc)
     doc = parse(doc)
     inputs = doc.css('input')
-    textareas = doc.css('textarea')
 
     {
       title: inputs[0]['value'],
       signature: 1,
       autocr: 'on',
-      text: textareas[0].content
+      text: textarea_of(doc)
     }
   end
 
@@ -188,12 +192,17 @@ module ParseHtml
     content[last_line...-1].strip.sub(@@from_rex, '\1')
   end
 
+  @@headSpRex = /(?:\r?\n){2}/
+
   def parse_content(filecontent)
-    split_index = filecontent.index("\n\n") 
+    split_index = filecontent.index(@@headSpRex) 
+    p filecontent
+    p split_index
 
 
     begin
       head = filecontent[0...split_index].split(/[\n,]/)
+      p head
       body = filecontent[split_index...-1]
 
       {
@@ -202,12 +211,12 @@ module ParseHtml
         title: head && get_value(head[3]),
         date: head && get_date(get_value(head[4])),
         filename: '',
-        content: body,
+        text: body,
         from: get_from(body)
       }
     rescue
       {
-        content: filecontent,
+        text: filecontent,
         from: get_from(filecontent)
       }
     end
