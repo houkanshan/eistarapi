@@ -57,7 +57,7 @@ put "/boards/:boardname/posts/:filename" do
 
   boardname = params[:boardname]
   filename = params[:filename]
-  #begin 
+  begin 
 
     post = Post.new(get_bbs_set_cookies(request.cookies))
     res = post.update(boardname, filename, {
@@ -67,13 +67,13 @@ put "/boards/:boardname/posts/:filename" do
     #post.find(boardname, post.list(boardname)[0][:filename]).to_json
     post.find(boardname, filename).to_json
 
-  #rescue RuntimeError => detail
-    #p detail.message
-    #status 400
-    #err = error_res(:update_failed)
-    #err[:detail] = detail.message
-    #err.to_json
-  #end
+  rescue RuntimeError => detail
+    p detail.message
+    status 400
+    err = error_res(:update_failed)
+    err[:detail] = detail.message
+    err.to_json
+  end
 
 end
 
@@ -122,6 +122,7 @@ post "/boards/:boardname/posts/:filename/reply" do
     err[:detail] = detail.message
     err.to_json
   end
+
 end
 
 post "/boards/:boardname/posts/:filename/cc" do

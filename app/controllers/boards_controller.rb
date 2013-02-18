@@ -1,4 +1,5 @@
 get '/boards' do
+  content_type :json
   begin
     cookies = get_bbs_set_cookies(request.cookies)
     new_board = Board.new cookies
@@ -12,6 +13,7 @@ get '/boards' do
 end
 
 get "/boards/:boardname" do
+  content_type :json
   #params[:boardname]
   begin
     cookies = get_bbs_set_cookies(request.cookies)

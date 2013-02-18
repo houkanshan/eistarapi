@@ -112,7 +112,7 @@ class PostsControllerTest < FunctionalTestCase
 
   def test_get_1_posts
     posts = get_posts @boardName, start: 0, count:1
-    assert_equal 1810, Integer(posts[0]['index'])
+    assert_equal true, Integer(posts[0]['index']) >= 1810
   end
 
   def test_get_unkown_board
@@ -196,7 +196,7 @@ class PostsControllerTest < FunctionalTestCase
 
     # update post
     new_post = update_post(@boardName, new_post["filename"], @update_post)
-    assert_equal true, new_post["content"].include?(@update_post[:text])
+    assert_equal true, new_post["text"].include?(@update_post[:text])
 
     # get update post
     new_post2 = get_post(@boardName, new_post["filename"])

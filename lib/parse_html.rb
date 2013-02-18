@@ -58,7 +58,8 @@ module ParseHtml
   end
 
   def get_board_note(doc)
-    parse(doc).css('table')[0].content
+    table = parse(doc).css('table')[0]
+    table ? table.content : ''
   end
 
   def get_board_info(doc)
@@ -145,7 +146,7 @@ module ParseHtml
       title: inputs[0]['value'],
       signature: 1,
       autocr: 'on',
-      text: textarea_of(doc)
+      text: doc.css('textarea')[0].content
     }
   end
 
@@ -196,13 +197,9 @@ module ParseHtml
 
   def parse_content(filecontent)
     split_index = filecontent.index(@@headSpRex) 
-    p filecontent
-    p split_index
-
 
     begin
       head = filecontent[0...split_index].split(/[\n,]/)
-      p head
       body = filecontent[split_index...-1]
 
       {

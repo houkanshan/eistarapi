@@ -12,11 +12,11 @@ class Board < Resource
       # http://www.dian.org.cn:81/bbsdoc?board=Water
       board_page = self.class.get("#{URL[:board_page]}?board=#{boardname}")
       info = get_board_info(board_page.body)
+      info[:name] = boardname
 
       # http://www.dian.org.cn:81/bbsnot?board=Water
       note_page = self.class.get("#{URL[:board_note]}?board=#{boardname}")
       info[:note] = get_board_note(note_page.body)
-      info[:name] = boardname
 
       info
     rescue

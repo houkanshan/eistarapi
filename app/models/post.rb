@@ -67,7 +67,7 @@ class Post < Resource
   end
   
   def update(boardname, filename, opt)
-    #begin 
+    begin 
       # get origin post
       url = link_to(:edit_page, boardname, filename)
       res = self.class.get(url)
@@ -91,9 +91,9 @@ class Post < Resource
       end
 
       opt
-    #rescue
-      #raise get_warning(res.body)
-    #end
+    rescue
+      raise get_warning(res.body)
+    end
   end
 
   def delete(boardname, filename)
@@ -174,7 +174,6 @@ class Post < Resource
   end
 
   @@headRex = /((?:.+\n){3}\r?\n)/
-  @@tailRex = //
 
   def insert_content_in(postcontent, content=nil)
 

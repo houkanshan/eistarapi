@@ -16,6 +16,7 @@ class Resource
     opt.each do |key, value|
       if value.class == String
         value = @@converter.convert(value) 
+        value.gsub!("\r", '');
       end
       new_opt[key] = value
     end

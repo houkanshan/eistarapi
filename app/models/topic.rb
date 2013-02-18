@@ -7,16 +7,16 @@ class Topic < Resource
   }
 
   def list(boardname, opt = {start: 0, count: 20})
-    #begin
+    begin
       depage = DePage.new(:topic, "#{@@url[:board_page]}?board=#{boardname}")
       depage.get_list opt[:start], opt[:count]
-    #rescue
-
-    #end
+    rescue
+      raise get_warning(depage.last_page.body)
+    end
   end
 
   def find(boardname, filename)
-    #begin
+    begin
       url = "#{@@url[:topic_page]}?board=#{boardname}&file=#{filename}"
 
       topic_page = self.class.get(url)
@@ -24,8 +24,8 @@ class Topic < Resource
       #post[:filename] = filename
 
       posts
-    #rescue
-
-    #end
+    rescue
+      raise get_warning(topic_page.body)
+    end
   end
 end
