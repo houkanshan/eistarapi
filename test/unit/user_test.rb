@@ -1,12 +1,11 @@
 require_relative "../test_helper"
 
 class UserTest < TestCase
-  #def setup
-    #@user = build :user
-  #end
+  def test_find_user
+    user = User.new
+    usr = user.find('houks')
 
-  #def test_user_name
-    ## dummy
-  #end
+    assert_equal usr[:id] , 'houks'
+  end
 end
 

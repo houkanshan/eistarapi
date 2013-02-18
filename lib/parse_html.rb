@@ -20,7 +20,7 @@ module ParseHtml
   end
 
   def get_textcontent(doc)
-    parse(doc).css('html')[0].content
+    parse(doc).css('html')[0].content.strip
   end
 
   def get_warning(doc)
@@ -75,7 +75,9 @@ module ParseHtml
       {
         filename: cols[4].css('a')[0]['href'].match(/file=(M\..*\.A)/)[1],
         index: cols[0].content,
-        author_id: cols[2].content,
+        author: {
+          id: cols[2].content
+        },
         date: cols[3].content,
         title: crop_title(cols[4].css('a')[0].content),
         size: get_size(cols[4].content)
@@ -90,7 +92,9 @@ module ParseHtml
       {
         filename: filename_from_link(cols[4].css('a')[0]['href']),
         index: cols[0].content,
-        author_id: cols[2].content,
+        author: {
+          id: cols[2].content
+        },
         date: cols[3].content,
         title: crop_title(cols[4].css('a')[0].content)
       }
@@ -147,6 +151,57 @@ module ParseHtml
       signature: 1,
       autocr: 'on',
       text: doc.css('textarea')[0].content
+    }
+  end
+
+  def parse_usr_info(doc)
+    doc = parse(doc)
+    content = doc.css('table')[0].content
+    content.gsub!("\r", '')
+
+    lines = content.split("\n")
+
+
+    if lines[1] =~ /(.*) \((.*)\) 共上站 (\d+) 次，发表文章 (\d+) 篇/
+      id = $1
+      name = $2
+      login_count = $3
+      post_count = $4
+    end
+
+    if lines[2] =~ /(?:\[(.*)\])?上次在 \[(.*)\] 从 \[(.*)\] 到本站一游。/
+      constellation = $1
+      last_login = {
+        time: $2,
+        from: $3
+      }
+    end
+
+    if lines[3] =~ /信箱：\[.*\]  经验值：\[(\d+)\]\((.+)\) 表现值：\[(\d+)\]\((.+)\) 生命力：\[(.+)\]。/
+      exp = {
+      num: $1,
+      title: $2
+      }
+      perf = {
+        num: $3,
+        title: $4
+      }
+      hp = {
+        num: $5
+      }
+    end
+
+
+    {
+      id: id,
+      name: name,
+      login_count: login_count,
+      post_count: post_count,
+      constellation: constellation,
+      last_login: last_login,
+      exp: exp,
+      hp: hp,
+      perf: perf
     }
   end
 

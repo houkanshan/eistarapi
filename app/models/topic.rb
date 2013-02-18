@@ -1,9 +1,8 @@
 # encoding: UTF-8
 class Topic < Resource
-  host = settings.api['host']
   @@url = {
-    board_page: "#{host}/bbstdoc",
-    topic_page: "#{host}/bbstcon",
+    board_page: "#{@@host}/bbstdoc",
+    topic_page: "#{@@host}/bbstcon",
   }
 
   def list(boardname, opt = {start: 0, count: 20})

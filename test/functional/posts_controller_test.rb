@@ -190,6 +190,9 @@ class PostsControllerTest < FunctionalTestCase
     new_post = create_post(@boardName, @new_post) 
     assert_equal @new_post[:title], new_post["title"]
 
+    # prevent to fast post
+    sleep 5
+
     # get new post
     new_post2 = get_post @boardName, new_post["filename"]
     assert_same_post new_post2, new_post

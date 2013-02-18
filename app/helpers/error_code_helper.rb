@@ -7,7 +7,8 @@ ERROR_MAP = {
   no_board: {code: 105, msg: 'board name error'},
   create_failed: {code: 106, msg: 'create post error'},
   update_failed: {code: 107, msg: 'edit post error'},
-  cc_failed: {code: 108, msg: 'cc failed'}
+  cc_failed: {code: 108, msg: 'cc failed'},
+  no_user: {code: 109, msg: 'user not found'}
 }
 
 #module ErrorCodeHelper

@@ -20,6 +20,7 @@ module TopicsControllerTestHelper
 
 
 end
+
 class TopicsControllerTest < FunctionalTestCase
   include TopicsControllerTestHelper
 

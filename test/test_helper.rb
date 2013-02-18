@@ -17,6 +17,7 @@ class TestCase < MiniTest::Unit::TestCase
     super
     #DatabaseCleaner.clean
   end
+
 end
 
 class FunctionalTestCase < TestCase

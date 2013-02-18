@@ -4,7 +4,9 @@ class Resource
   include HTTParty
   include ParseHtml
 
-  def initialize(cookies)
+  @@host = settings.api['host']
+
+  def initialize(cookies={utmpid: ''})
     @cookies = cookies
     self.class.cookies(cookies)
   end

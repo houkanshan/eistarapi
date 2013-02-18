@@ -8,3 +8,7 @@ get '/login' do
 
   a.to_json
 end
+
+#error 404 do
+    #params.to_json
+#end
