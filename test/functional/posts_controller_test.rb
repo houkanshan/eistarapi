@@ -44,8 +44,9 @@ module PostsControllerTestHelper
     get_json(last_response)
   end
 
-  def cc_post (boardname, filename)
-    post "/boards/#{boardname}/posts/#{filename}/cc"
+  def cc_post (boardname, filename, to)
+    post "/boards/#{boardname}/posts/#{filename}/cc", {to: to}
+    get_json(last_response)
   end
 
   def assert_same_post(post1, post2)
@@ -79,7 +80,7 @@ class PostsControllerTest < FunctionalTestCase
     }
 
     @reply = {
-      text: "this is a reply \n 测试中文"
+      text: "this is a reply \n 测试中文 \n 回复!"
     }
 
   end
@@ -179,7 +180,7 @@ class PostsControllerTest < FunctionalTestCase
     #delete '/sessions'
   end
 
-  def test_create_and_update_post_and_reply_and_delete_post
+  def test_create_and_update_post_and_reply_and_cc_and_delete_post
     unless logined?
       post '/sessions', :username => 'houks', :password => '1111'
     end
@@ -212,7 +213,8 @@ class PostsControllerTest < FunctionalTestCase
     new_post = get_post(@boardName, new_post["filename"])
     assert_equal 404, last_response.status
 
-    sleep 2
+    # prevent to fast post
+    sleep 5
 
     # get new post
     last_post = get_post(@boardName, get_posts(@boardName)[0]["filename"])
@@ -223,6 +225,22 @@ class PostsControllerTest < FunctionalTestCase
     # delete reply
     delete_post(@boardName, replyed_post["filename"])
     assert_equal 200, last_response.status
+
+    # test cc
+    last_filename = get_posts(@boardName)[0]["filename"]
+    
+    # prevent to fast post
+    sleep 5
+
+    cced_post = cc_post(@boardName, last_filename, "Water")
+    cced_post2 = get_post("Water", cced_post["filename"])
+
+    assert_equal 200, last_response.status
+    assert_same_post cced_post, cced_post2
+
+    delete_post("Water", cced_post["filename"])
+    assert_equal 200, last_response.status
+
   end
 
   #def test_cc_post
@@ -230,8 +248,5 @@ class PostsControllerTest < FunctionalTestCase
     #post cc_post("Game", new_post.filename)
   #end
 
-  #def test_get_post_topic
-
-  #end
 
 end

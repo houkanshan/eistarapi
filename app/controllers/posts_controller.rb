@@ -8,6 +8,7 @@ get "/boards/:boardname/posts" do
 
     post.list(params[:boardname], start:start, count:count).to_json
   rescue RuntimeError => detail
+    p detail.message
     status 404
     err = error_res(:no_board)
     err[:detail] = detail.message
@@ -21,6 +22,7 @@ get "/boards/:boardname/posts/:filename" do
     post = Post.new(get_bbs_set_cookies(request.cookies))
     post.find(params[:boardname], params[:filename]).to_json
   rescue RuntimeError => detail
+    p detail.message
     status 404
     err = error_res(:no_board)
     err[:detail] = detail.message
@@ -42,6 +44,7 @@ post "/boards/:boardname/posts" do
 
     post.find(boardname, post.list(params[:boardname])[0][:filename]).to_json
   rescue RuntimeError => detail
+    p detail.message
     status 400
     err = error_res(:create_failed)
     err[:detail] = detail.message
@@ -65,6 +68,7 @@ put "/boards/:boardname/posts/:filename" do
     post.find(boardname, filename).to_json
 
   rescue RuntimeError => detail
+    p detail.message
     status 400
     err = error_res(:update_failed)
     err[:detail] = detail.message
@@ -73,6 +77,25 @@ put "/boards/:boardname/posts/:filename" do
 
 end
 
+delete "/boards/:boardname/posts/:filename" do
+  content_type :json
+  begin
+    post = Post.new(get_bbs_set_cookies(request.cookies))
+    res = post.delete(params[:boardname], params[:filename])
+
+    post = error_res(:success)
+    post[:detail] = res
+
+    post.to_json
+  rescue RuntimeError => detail
+    p detail.message
+    status 404
+    err = error_res(:no_board)
+    err[:detail] = detail.message
+    err.to_json
+  end
+
+end
 
 post "/boards/:boardname/posts/:filename/reply" do
   content_type :json
@@ -93,6 +116,7 @@ post "/boards/:boardname/posts/:filename/reply" do
     post.find(boardname, post.list(boardname)[0][:filename]).to_json
 
   rescue RuntimeError => detail
+    p detail.message
     status 400
     err = error_res(:create_failed)
     err[:detail] = detail.message
@@ -100,20 +124,26 @@ post "/boards/:boardname/posts/:filename/reply" do
   end
 end
 
-delete "/boards/:boardname/posts/:filename" do
+post "/boards/:boardname/posts/:filename/cc" do
   content_type :json
+
+  boardname = params[:boardname]
+  filename = params[:filename]
+  to = params[:to]
+
   begin
     post = Post.new(get_bbs_set_cookies(request.cookies))
-    res = post.delete(params[:boardname], params[:filename])
+    res = post.cc(boardname, filename, to)
 
-    post = error_res(:success)
-    post[:detail] = res
+    cced = post.find(to, post.list(to)[0][:filename])
 
-    post.to_json
+    cced.to_json
   rescue RuntimeError => detail
-    status 404
-    err = error_res(:no_board)
+    p detail.message
+    status 400
+    err = error_res(:cc_failed)
     err[:detail] = detail.message
     err.to_json
   end
+
 end

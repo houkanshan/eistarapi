@@ -121,31 +121,48 @@ class Post < Resource
       # http://www.dian.org.cn:81/bbssnd?board=Weather
       url = link_to(:create_url, boardname)
       opt_orig = encode_for_bbs(opt_orig)
-      res = self.class.post(url, {body: opt_orig})
+      page = self.class.post(url, {body: opt_orig})
 
-      msg = get_warning(res.body)
+      msg = get_warning(page.body)
 
-      if (msg.class == String) && msg.index('不能')
+      unless (msg.class == String) && msg.empty?
         raise msg
       end
 
       opt_orig
 
     rescue
-      raise get_warning(res.body)
+      raise get_warning(page.body)
     end
   end
 
   def cc(boardname, filename, to)
     begin
+      url = link_to(:cc_url)
+
+      res = self.class.post(url, {body: {
+        board: boardname,
+        file: filename,
+        target: to
+      }})
+
+      msg = get_textcontent(res.body)
+
+      unless msg.class == String && msg.include?('已转')
+        raise msg
+      end
+
     rescue
+      p msg = get_warning(res.body)
+      raise msg
     end
   end
 
   private
 
-  def link_to(page, boardname, filename=nil)
-    url = "#{URL[page]}?board=#{boardname}" + (filename ? "&file=#{filename}" : '')
+  def link_to(page, boardname=nil, filename=nil)
+    url = "#{URL[page]}"+ (boardname ? "?board=#{boardname}": '')+ 
+    (filename ? "&file=#{filename}" : '')
   end
 
 end

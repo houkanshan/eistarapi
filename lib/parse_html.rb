@@ -19,6 +19,10 @@ module ParseHtml
     cookie
   end
 
+  def get_textcontent(doc)
+    parse(doc).css('html')[0].content
+  end
+
   def get_warning(doc)
     node = parse(doc).css('html')[0]
     warn_text = node.content
