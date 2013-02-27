@@ -1,12 +1,9 @@
 get '/' do
-  slim :'home/index'
+  'hello world, check the document at https://github.com/houkanshan/eistarapi'
 end
 
 get '/login' do
-  content_type :json
-  a = {a:1,b:2}
 
-  a.to_json
 end
 
 #error 404 do
