@@ -10,10 +10,12 @@ Bundler.require(:default, ENV["RACK_ENV"].to_sym)
 #DB = Sequel.connect(YAML.load_file("./config/database.yml")["default"]["url"])
 
 # init sinatra
+=begin
 set :sessions, true
 set :session_secret, "b8b7b8a915fd0900bd4ad841e04d42d5"
 set :root, File.expand_path(".")
 set :views, settings.root + "/app/views"
+=end
 
 # config
 set :api, YAML.load_file("./config/api.yml")

@@ -14,7 +14,6 @@ GEM
       execjs
     coffee-script-source (1.4.0)
     daemons (1.1.9)
-    database_cleaner (0.9.1)
     eventmachine (1.0.0)
     execjs (1.4.0)
       multi_json (~> 1.0)
@@ -44,7 +43,7 @@ GEM
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
-    sass (3.2.5)
+    rake (10.0.3)
     sinatra (1.3.3)
       rack (~> 1.3, >= 1.3.6)
       rack-protection (~> 1.2)
@@ -63,11 +62,7 @@ GEM
       tilt (~> 1.3)
     sinatra-flash (0.3.0)
       sinatra (>= 1.0.0)
-    slim (1.3.6)
-      temple (~> 0.5.5)
-      tilt (~> 1.3.3)
     slop (3.4.3)
-    temple (0.5.5)
     thin (1.5.0)
       daemons (>= 1.0.9)
       eventmachine (>= 0.12.6)
@@ -83,17 +78,16 @@ PLATFORMS
 DEPENDENCIES
   capistrano
   coffee-script
-  database_cleaner
   httparty
   json
   nokogiri
   pry
+  rack (= 1.5.0)
   rack-test
-  sass
+  rake
   sinatra
   sinatra-assetpack
   sinatra-contrib
   sinatra-flash
-  slim
   thin
   uglifier

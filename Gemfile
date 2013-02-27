@@ -1,8 +1,8 @@
 #source "http://ruby.taobao.org"
 source "https://rubygems.org"
 
-gem "slim"
-gem "sass"
+#gem "slim"
+#gem "sass"
 #gem "sqlite3"
 #gem "sequel"
 gem "sinatra"
@@ -16,6 +16,8 @@ gem "httparty"
 
 group :development, :test do
   gem "pry"
+  gem 'rack', '1.5.0'
+  gem 'rake'
 end
 
 group :production do
@@ -25,7 +27,7 @@ end
 group :test do
   gem "rack-test"
   #gem "factory_girl"
-  gem "database_cleaner"
+  #gem "database_cleaner"
 end
 
 group :deploy do
