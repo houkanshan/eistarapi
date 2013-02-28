@@ -1,0 +1,451 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Eistarapi by houkanshan</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/houkanshan/eistarapi">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/houkanshan/eistarapi/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/houkanshan/eistarapi/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Eistarapi</h1>
+          <p>a api for eistar bbs.</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/houkanshan">houkanshan</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>eistarapi</h1>
+
+<p>provide api for eistar bbs.</p>
+
+<p>实际上这仅仅是个代理，所有数据从 <a href="http://www.dian.org.cn:81">http://www.dian.org.cn:81</a> 获取，服务器无数据库，因此不会保存任何用户数据~</p>
+
+<p>注意，权限与论坛一致，隐藏板块只有用具有权限的帐号登录才可见。</p>
+
+<p>Powered by Ruby, Sinatra, Nokogiri, httparty</p>
+
+<h1>API Document</h1>
+
+<h2>Session</h2>
+
+<p>用户登录通过创建session进行，使用正确的用户名密码创建一个session成功，即为登录成功。
+服务器会在返回的HTTP头中设置set-cookies字段，或者你也可以利用返回结果手动设置你下次请求的cookie。</p>
+
+<p>删除session即为登出，当然实际上eistar的服务器上应该并没有销毁登录，它只会通过session的超时来销毁。</p>
+
+<h3>create a session (e.q. login)</h3>
+
+<pre><code>POST /session
+</code></pre>
+
+<h4>request body</h4>
+
+<div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">"username"</span><span class="p">:</span> <span class="s2">"houkanshan"</span><span class="p">,</span>
+  <span class="nt">"password"</span><span class="p">:</span> <span class="s2">"passwordxxx"</span>
+<span class="p">}</span>
+</pre></div>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">"set_cookie"</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">"utmpkey"</span><span class="p">:</span> <span class="mi">1111111</span><span class="p">,</span>
+    <span class="nt">"utmpnum"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="nt">"utmpuserid"</span><span class="p">:</span> <span class="s2">"houkanshan"</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>delete a session (e.q. logout)</h3>
+
+<pre><code>DELETE /session
+</code></pre>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">"set_cookie"</span> <span class="p">{</span>
+    <span class="nt">"utmpkey"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="nt">"utmpnum"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="nt">"utmpuserid"</span><span class="p">:</span> <span class="s2">""</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h2>User</h2>
+
+<p>用户接口主要提供用户信息</p>
+
+<h3>get a user's info</h3>
+
+<p>获取某用户信息</p>
+
+<pre><code>GET /users/:id
+</code></pre>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">"id"</span><span class="p">:</span> <span class="s2">"houks"</span><span class="p">,</span>
+    <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"呵呵"</span><span class="p">,</span>
+    <span class="nt">"login_count"</span><span class="p">:</span> <span class="s2">"1207"</span><span class="p">,</span>
+    <span class="nt">"post_count"</span><span class="p">:</span> <span class="s2">"372"</span><span class="p">,</span>
+    <span class="nt">"constellation"</span><span class="p">:</span> <span class="s2">"天蝎座"</span><span class="p">,</span>
+    <span class="nt">"last_login"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"time"</span><span class="p">:</span> <span class="s2">"Wed Feb 27 13:28:49 2013"</span><span class="p">,</span>
+        <span class="nt">"from"</span><span class="p">:</span> <span class="s2">"192.168.7.89"</span>
+    <span class="p">},</span>
+    <span class="nt">"exp"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"num"</span><span class="p">:</span> <span class="s2">"2100"</span><span class="p">,</span>
+        <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"老站友"</span>
+    <span class="p">},</span>
+    <span class="nt">"hp"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"num"</span><span class="p">:</span> <span class="s2">"179"</span>
+    <span class="p">},</span>
+    <span class="nt">"perf"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"num"</span><span class="p">:</span> <span class="s2">"18"</span><span class="p">,</span>
+        <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"还不错"</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h2>Board</h2>
+
+<p>BBS 版块接口</p>
+
+<h3>get boards list</h3>
+
+<p>获取所有可见版块</p>
+
+<pre><code>GET /boards
+</code></pre>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"Weather"</span><span class="p">,</span>
+        <span class="nt">"category"</span><span class="p">:</span> <span class="s2">"生活"</span><span class="p">,</span>
+        <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"天气预报"</span><span class="p">,</span>
+        <span class="nt">"admin"</span><span class="p">:</span> <span class="s2">"SYSOPs"</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"Wishes"</span><span class="p">,</span>
+        <span class="nt">"category"</span><span class="p">:</span> <span class="s2">"交流"</span><span class="p">,</span>
+        <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"温馨祝福"</span><span class="p">,</span>
+        <span class="nt">"admin"</span><span class="p">:</span> <span class="s2">"STONE"</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+
+<h3>get a board's info</h3>
+
+<p>获取某版块信息</p>
+
+<pre><code>GET /boards/:boardname
+</code></pre>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"Weather(天气预报)"</span><span class="p">,</span>
+    <span class="nt">"admin"</span><span class="p">:</span> <span class="s2">"SYSOPs"</span><span class="p">,</span>
+    <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"Weather"</span><span class="p">,</span>
+    <span class="nt">"note"</span><span class="p">:</span> <span class="s2">""</span>
+<span class="p">}</span>
+</pre></div>
+
+<h2>Topic</h2>
+
+<p>版块在主题模式下的内容</p>
+
+<h3>get topics list</h3>
+
+<p>获取某版块的主题列表</p>
+
+<pre><code>GET /boards/:boardname/topics
+</code></pre>
+
+<h4>request body</h4>
+
+<p>可选参数，默认为start=0, count=20</p>
+
+<div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">"start"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="err">//</span> <span class="err">optional,</span> <span class="err">default</span> <span class="err">0</span>
+  <span class="nt">"count"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="err">//</span> <span class="err">optional,</span> <span class="err">default</span> <span class="err">20</span>
+<span class="p">}</span>
+</pre></div>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nt">"filename"</span><span class="p">:</span> <span class="s2">"M.1355479789.A"</span><span class="p">,</span>
+        <span class="nt">"index"</span><span class="p">:</span> <span class="s2">"1"</span><span class="p">,</span>
+        <span class="nt">"author"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">"id"</span><span class="p">:</span> <span class="s2">"warren"</span>
+        <span class="p">},</span>
+        <span class="nt">"date"</span><span class="p">:</span> <span class="s2">"Dec 14 18:09"</span><span class="p">,</span>
+        <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"好冷，这是要下雪的节奏吗"</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="nt">"filename"</span><span class="p">:</span> <span class="s2">"M.1347623570.A"</span><span class="p">,</span>
+        <span class="nt">"index"</span><span class="p">:</span> <span class="s2">"2"</span><span class="p">,</span>
+        <span class="nt">"author"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">"id"</span><span class="p">:</span> <span class="s2">"candycao"</span>
+        <span class="p">},</span>
+        <span class="nt">"date"</span><span class="p">:</span> <span class="s2">"Sep 14 19:52"</span><span class="p">,</span>
+        <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"武汉温差"</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+
+<h3>get a topic</h3>
+
+<p>获取某个主题的内容，主题通过 boardname + filename 索引（bbs实际上是通过文件来存储帖子）</p>
+
+<pre><code>GET /boards/:boardname/topics/:filename
+</code></pre>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nt">"author"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">"id"</span><span class="p">:</span> <span class="s2">"warren"</span><span class="p">,</span>
+            <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"warren"</span>
+        <span class="p">},</span>
+        <span class="nt">"border"</span><span class="p">:</span> <span class="s2">"Weather"</span><span class="p">,</span>
+        <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"好冷，这是要下雪的节奏吗"</span><span class="p">,</span>
+        <span class="nt">"date"</span><span class="p">:</span> <span class="s2">"2012年12月14日18:09:48 星期五"</span><span class="p">,</span>
+        <span class="nt">"filename"</span><span class="p">:</span> <span class="s2">"M.1355479789.A"</span><span class="p">,</span>
+        <span class="nt">"text"</span><span class="p">:</span> <span class="s2">"xxxx"</span><span class="p">,</span>
+        <span class="nt">"from"</span><span class="p">:</span> <span class="s2">"xxx.xxx.xxx.xxx"</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+
+</pre></div>
+
+<h2>Post</h2>
+
+<p>版块在帖子模式下的内容，以及对单个帖子的相关功能</p>
+
+<h3>get posts list</h3>
+
+<pre><code>GET /boards/:boardname/posts
+</code></pre>
+
+<h4>request body</h4>
+
+<p>可选参数，默认为start=0, count=20</p>
+
+<div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">"start"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="err">//</span> <span class="err">optional,</span> <span class="err">default</span> <span class="err">0</span>
+  <span class="nt">"count"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="err">//</span> <span class="err">optional,</span> <span class="err">default</span> <span class="err">20</span>
+<span class="p">}</span>
+</pre></div>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nt">"filename"</span><span class="p">:</span> <span class="s2">"M.1361195402.A"</span><span class="p">,</span>
+        <span class="nt">"index"</span><span class="p">:</span> <span class="s2">"1811"</span><span class="p">,</span>
+        <span class="nt">"author"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">"id"</span><span class="p">:</span> <span class="s2">"houks"</span>
+        <span class="p">},</span>
+        <span class="nt">"date"</span><span class="p">:</span> <span class="s2">"Feb 18 21:50"</span><span class="p">,</span>
+        <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"Re: 该穿中袖了么~"</span><span class="p">,</span>
+        <span class="nt">"size"</span><span class="p">:</span> <span class="s2">"16"</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="nt">"filename"</span><span class="p">:</span> <span class="s2">"M.1361193048.A"</span><span class="p">,</span>
+        <span class="nt">"index"</span><span class="p">:</span> <span class="s2">"1810"</span><span class="p">,</span>
+        <span class="nt">"author"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">"id"</span><span class="p">:</span> <span class="s2">"houks"</span>
+        <span class="p">},</span>
+        <span class="nt">"date"</span><span class="p">:</span> <span class="s2">"Feb 18 21:10"</span><span class="p">,</span>
+        <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"Re: test"</span><span class="p">,</span>
+        <span class="nt">"size"</span><span class="p">:</span> <span class="s2">"22"</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+
+<h3>get a post</h3>
+
+<p>获取某个帖子的内容</p>
+
+<pre><code>GET /boards/:boardname/posts/:filename
+</code></pre>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">"author"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"id"</span><span class="p">:</span> <span class="s2">"houks"</span><span class="p">,</span>
+        <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"呵呵"</span>
+    <span class="p">},</span>
+    <span class="nt">"border"</span><span class="p">:</span> <span class="s2">"Weather"</span><span class="p">,</span>
+    <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"Re: test"</span><span class="p">,</span>
+    <span class="nt">"date"</span><span class="p">:</span> <span class="s2">"Mon Feb 18 21:10:48 2013"</span><span class="p">,</span>
+    <span class="nt">"filename"</span><span class="p">:</span> <span class="s2">"M.1361193048.A"</span><span class="p">,</span>
+    <span class="nt">"text"</span><span class="p">:</span> <span class="s2">"xxx"</span><span class="p">,</span>
+    <span class="nt">"from"</span><span class="p">:</span> <span class="s2">"xxx.xx.xx.xx"</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>create a post</h3>
+
+<p>创建一个帖子</p>
+
+<pre><code>POST /boards/:boardname/posts
+</code></pre>
+
+<h4>request body</h4>
+
+<p>title参数必需，text参数可选</p>
+
+<div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"test_title"</span><span class="p">,</span>
+  <span class="nt">"text"</span><span class="p">:</span> <span class="s2">"test_content"</span>   <span class="err">//</span> <span class="err">optional</span><span class="p">,</span> <span class="err">default</span> <span class="err">''</span>
+<span class="p">}</span>
+</pre></div>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">"author"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"id"</span><span class="p">:</span> <span class="s2">"houks"</span><span class="p">,</span>
+        <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"呵呵"</span>
+    <span class="p">},</span>
+    <span class="nt">"border"</span><span class="p">:</span> <span class="s2">"Weather"</span><span class="p">,</span>
+    <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"test_title"</span><span class="p">,</span>
+    <span class="nt">"date"</span><span class="p">:</span> <span class="s2">"Wed Feb 27 14:26:56 2013"</span><span class="p">,</span>
+    <span class="nt">"filename"</span><span class="p">:</span> <span class="s2">"M.1361946416.A"</span><span class="p">,</span>
+    <span class="nt">"text"</span><span class="p">:</span> <span class="s2">"xxx"</span><span class="p">,</span>
+    <span class="nt">"from"</span><span class="p">:</span> <span class="s2">"x.x.x.x"</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>edit a post</h3>
+
+<p>编辑帖子</p>
+
+<pre><code>PUT /boards/:boardname/posts/:filename
+</code></pre>
+
+<h4>request body</h4>
+
+<div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">"text"</span><span class="p">:</span> <span class="s2">"change you~!"</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>delete a post</h3>
+
+<p>删除帖子</p>
+
+<pre><code>DELETE /boards/:boardname/posts/:filename
+</code></pre>
+
+<h4>response body</h4>
+
+<p>{
+    "code": 100,
+    "msg": "successed ~",
+    "detail": "删除成功."
+}</p>
+
+<h3>reply a post</h3>
+
+<p>回复帖子</p>
+
+<pre><code>POST /boards/:boardname/posts/:filename/reply
+</code></pre>
+
+<h4>request body</h4>
+
+<div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">"text"</span><span class="p">:</span> <span class="s2">"this is a reply ~"</span>
+<span class="p">}</span>
+</pre></div>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">"author"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"id"</span><span class="p">:</span> <span class="s2">"houks"</span><span class="p">,</span>
+        <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"呵呵"</span>
+    <span class="p">},</span>
+    <span class="nt">"border"</span><span class="p">:</span> <span class="s2">"Weather"</span><span class="p">,</span>
+    <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"Re: test_title"</span><span class="p">,</span>
+    <span class="nt">"date"</span><span class="p">:</span> <span class="s2">"Wed Feb 27 14:30:56 2013"</span><span class="p">,</span>
+    <span class="nt">"filename"</span><span class="p">:</span> <span class="s2">"M.13619464123.A"</span><span class="p">,</span>
+    <span class="nt">"text"</span><span class="p">:</span> <span class="s2">"xxx"</span><span class="p">,</span>
+    <span class="nt">"from"</span><span class="p">:</span> <span class="s2">"x.x.x.x"</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>cc a post</h3>
+
+<p>转发帖子</p>
+
+<pre><code>POST /boards/:boardname/posts/:filename/cc
+</code></pre>
+
+<h4>request body</h4>
+
+<p>to为被转发到的版块</p>
+
+<div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">"to"</span><span class="p">:</span> <span class="s2">"Water"</span>
+<span class="p">}</span>
+</pre></div>
+
+<h4>response body</h4>
+
+<div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">"author"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">"id"</span><span class="p">:</span> <span class="s2">"houks"</span><span class="p">,</span>
+        <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"呵呵"</span>
+    <span class="p">},</span>
+    <span class="nt">"border"</span><span class="p">:</span> <span class="s2">"Weather"</span><span class="p">,</span>
+    <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"[转载] Re: 该穿中袖了么~"</span><span class="p">,</span>
+    <span class="nt">"date"</span><span class="p">:</span> <span class="s2">"Wed Feb 27 14:37:15 2013"</span><span class="p">,</span>
+    <span class="nt">"filename"</span><span class="p">:</span> <span class="s2">"M.1361947035.A"</span><span class="p">,</span>
+    <span class="nt">"text"</span><span class="p">:</span> <span class="s2">"【 以下文字转载自 Weather 讨论区 】\n【 原文由 candycao 所发表 】xxx"</span><span class="p">,</span>
+    <span class="nt">"from"</span><span class="p">:</span> <span class="s2">"x.x.x.x"</span>
+<span class="p">}</span>
+</pre></div>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
