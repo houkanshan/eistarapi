@@ -53,7 +53,7 @@ POST /login
 }
 ```
 
-### delete a session (e.q. logout)
+### delete a session (i.e. logout)
 
 删除当前session，即登出
 ```
