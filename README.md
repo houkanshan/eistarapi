@@ -22,10 +22,16 @@ API Document
 删除session即为登出，当然实际上eistar的服务器上应该并没有销毁登录，它只会通过session的超时来销毁。
 
 
-### create a session (e.q. login)
+### create a session (i.e. login)
+
+创建一个session，即登录
 
 ```
-POST /session
+POST /sessions
+```
+或者：
+```
+POST /login
 ```
 
 #### request body
@@ -49,8 +55,13 @@ POST /session
 
 ### delete a session (e.q. logout)
 
+删除当前session，即登出
 ```
-DELETE /session
+DELETE /sessions
+```
+或者
+```
+POST /logout
 ```
 
 #### response body
