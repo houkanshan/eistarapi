@@ -1,6 +1,8 @@
 # encoding: UTF-8
 require_relative "../test_helper"
 
+require "yaml"
+
 module PostsControllerTestHelper
 
   def logined?
@@ -82,6 +84,8 @@ class PostsControllerTest < FunctionalTestCase
     @reply = {
       text: "this is a reply \n 测试中文 \n 回复!"
     }
+
+    @testUsers =  YAML.load_file("test/testuser.yml")
 
   end
 
@@ -182,7 +186,7 @@ class PostsControllerTest < FunctionalTestCase
 
   def test_create_and_update_post_and_reply_and_cc_and_delete_post
     unless logined?
-      post '/sessions', :username => 'houks', :password => '1111'
+      post '/sessions', :username => @testUsers[0]["username"], :password => @testUsers[0]["password"].to_s
     end
 
     last_index1 = get_posts(@boardName)[0]["index"]

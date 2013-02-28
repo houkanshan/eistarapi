@@ -207,7 +207,6 @@ module ParseHtml
 
   private
   @@title_rex = /○ /
-  @@from_rex = /^.*\[FROM: (.*)\].*$/
 
   def parse(doc)
     Nokogiri::HTML(doc, nil, 'gbk')
@@ -230,7 +229,7 @@ module ParseHtml
   def get_author(author_str)
     pair = author_str.split(/[()]/)
     {
-      id: pair[0],
+      id: pair[0].strip,
       name: pair[1]
     }
   end
@@ -243,9 +242,10 @@ module ParseHtml
     date_str.split(/[()]/)[1]
   end
 
+  @@from_rex = /^.*\[FROM: (.*)\].*$/
   def get_from(content)
-    last_line = content.rindex("\n", -3)
-    content[last_line...-1].strip.sub(@@from_rex, '\1')
+    last_line = content.rindex("\n", -1) + 1
+    content[last_line..-1].gsub(@@from_rex, '\1')
   end
 
   @@headSpRex = /(?:\r?\n){2}/
@@ -255,7 +255,7 @@ module ParseHtml
 
     begin
       head = filecontent[0...split_index].split(/[\n,]/)
-      body = filecontent[split_index...-1]
+      body = filecontent[split_index...-1].strip
 
       {
         author: head && get_author(get_value(head[1])),
@@ -268,7 +268,7 @@ module ParseHtml
       }
     rescue
       {
-        text: filecontent,
+        text: filecontent.strip,
         from: get_from(filecontent)
       }
     end
