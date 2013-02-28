@@ -16,8 +16,8 @@ gem "httparty"
 
 group :development, :test do
   gem "pry"
-  gem 'rack', '1.5.0'
-  gem 'rake'
+  #gem 'rack', '1.5.0'
+  #gem 'rake'
 end
 
 group :production do
