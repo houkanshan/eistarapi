@@ -166,7 +166,7 @@ GET /boards/:boardname/topics
 
 可选参数，默认为start=0, count=20
 
-```json
+```javascript
 {
   "start": 0,  // optional, default 0
   "count": 2, // optional, default 20
@@ -235,7 +235,7 @@ GET /boards/:boardname/posts
 
 可选参数，默认为start=0, count=20
 
-```json
+```javascirpt
 {
   "start": 0,  // optional, default 0
   "count": 2, // optional, default 20
@@ -302,7 +302,7 @@ POST /boards/:boardname/posts
 
 title参数必需，text参数可选
 
-```json
+```javascript
 {
   "title": "test_title",
   "text": "test_content"   // optional, default ''
@@ -349,11 +349,13 @@ DELETE /boards/:boardname/posts/:filename
 ```
 
 #### response body
+```json
 {
     "code": 100,
     "msg": "successed ~",
     "detail": "删除成功."
 }
+```
 
 ### reply a post
 
