@@ -196,8 +196,8 @@
 <p>可选参数，默认为start=0, count=20</p>
 
 <div class="highlight"><pre><span class="p">{</span>
-  <span class="nt">"start"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="err">//</span> <span class="err">optional,</span> <span class="err">default</span> <span class="err">0</span>
-  <span class="nt">"count"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="err">//</span> <span class="err">optional,</span> <span class="err">default</span> <span class="err">20</span>
+  <span class="s2">"start"</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1">// optional, default 0</span>
+  <span class="s2">"count"</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="c1">// optional, default 20</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -264,11 +264,11 @@
 
 <p>可选参数，默认为start=0, count=20</p>
 
-<div class="highlight"><pre><span class="p">{</span>
-  <span class="nt">"start"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="err">//</span> <span class="err">optional,</span> <span class="err">default</span> <span class="err">0</span>
-  <span class="nt">"count"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="err">//</span> <span class="err">optional,</span> <span class="err">default</span> <span class="err">20</span>
-<span class="p">}</span>
-</pre></div>
+<pre lang="javascirpt"><code>{
+  "start": 0,  // optional, default 0
+  "count": 2, // optional, default 20
+}
+</code></pre>
 
 <h4>response body</h4>
 
@@ -331,8 +331,8 @@
 <p>title参数必需，text参数可选</p>
 
 <div class="highlight"><pre><span class="p">{</span>
-  <span class="nt">"title"</span><span class="p">:</span> <span class="s2">"test_title"</span><span class="p">,</span>
-  <span class="nt">"text"</span><span class="p">:</span> <span class="s2">"test_content"</span>   <span class="err">//</span> <span class="err">optional</span><span class="p">,</span> <span class="err">default</span> <span class="err">''</span>
+  <span class="s2">"title"</span><span class="o">:</span> <span class="s2">"test_title"</span><span class="p">,</span>
+  <span class="s2">"text"</span><span class="o">:</span> <span class="s2">"test_content"</span>   <span class="c1">// optional, default ''</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -375,11 +375,12 @@
 
 <h4>response body</h4>
 
-<p>{
-    "code": 100,
-    "msg": "successed ~",
-    "detail": "删除成功."
-}</p>
+<div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">"code"</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="nt">"msg"</span><span class="p">:</span> <span class="s2">"successed ~"</span><span class="p">,</span>
+    <span class="nt">"detail"</span><span class="p">:</span> <span class="s2">"删除成功."</span>
+<span class="p">}</span>
+</pre></div>
 
 <h3>reply a post</h3>
 
