@@ -2,8 +2,13 @@ get '/' do
   'hello world, check the document at https://github.com/houkanshan/eistarapi'
 end
 
-get '/login' do
+post '/login' do
+  call! env.merge("PATH_INFO" => '/sessions')
+end
 
+post 'logout' do
+  call! env.merge("PATH_INFO" => '/sessions',
+                  "REQUEST_METHOD" => 'DELETE')
 end
 
 #error 404 do
