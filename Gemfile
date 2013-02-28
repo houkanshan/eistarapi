@@ -21,7 +21,8 @@ group :development, :test do
 end
 
 group :production do
-  gem "thin"
+  #gem "thin"
+  gem "unicorn"
 end
 
 group :test do
