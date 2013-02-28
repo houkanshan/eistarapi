@@ -5,8 +5,7 @@ capybara-*.html
 .rspec
 /.bundle
 /vendor/bundle
-/log/*
-/tmp/*
+/log/*.log
 /db/*.sqlite3
 /public/system/*
 /coverage/
