@@ -57,9 +57,16 @@
 
 <p>删除session即为登出，当然实际上eistar的服务器上应该并没有销毁登录，它只会通过session的超时来销毁。</p>
 
-<h3>create a session (e.q. login)</h3>
+<h3>create a session (i.e. login)</h3>
 
-<pre><code>POST /session
+<p>创建一个session，即登录</p>
+
+<pre><code>POST /sessions
+</code></pre>
+
+<p>或者：</p>
+
+<pre><code>POST /login
 </code></pre>
 
 <h4>request body</h4>
@@ -81,9 +88,16 @@
 <span class="p">}</span>
 </pre></div>
 
-<h3>delete a session (e.q. logout)</h3>
+<h3>delete a session (i.e. logout)</h3>
 
-<pre><code>DELETE /session
+<p>删除当前session，即登出</p>
+
+<pre><code>DELETE /sessions
+</code></pre>
+
+<p>或者</p>
+
+<pre><code>POST /logout
 </code></pre>
 
 <h4>response body</h4>
